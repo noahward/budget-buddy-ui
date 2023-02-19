@@ -30,7 +30,11 @@
           class="text-white"
         />
       </q-tabs>
-      <q-btn flat round class="btn--no-hover">
+      <q-btn
+        flat
+        round
+        class="btn--no-hover"
+      >
         <q-avatar outlined>
           <img src="https://cdn.quasar.dev/img/avatar.png">
         </q-avatar>
