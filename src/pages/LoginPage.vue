@@ -1,5 +1,5 @@
 <template>
-  <q-page class="row justify-center content-center">
+  <q-page class="column justify-center content-center">
     <q-card class="bg-grey-1 container">
       <q-card-section class="q-mt-sm">
         <div class="text-h6">
@@ -82,6 +82,10 @@
         </Form>
       </q-card-section>
     </q-card>
+    <div class="q-mt-sm">
+      <span>New to Budget Buddy? </span>
+      <a href="/register" class="text-blue-9">Create an account</a>
+    </div>
   </q-page>
 </template>
 
@@ -97,7 +101,7 @@ const authStore = useAuthStore()
 
 const userSchema = object({
   email: string().required('Email is required').email('Enter a valid email address'),
-  password: string().required('Password is required').min(6)
+  password: string().required('Password is required')
 })
 
 let loginError = ref()
