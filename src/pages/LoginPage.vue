@@ -62,6 +62,16 @@
             />
             <span class="self-center">{{ errors.password }}</span>
           </div>
+          <div
+            v-if="loginError"
+            class="text-red text-caption row justify-start"
+          >
+            <q-icon
+              name="error"
+              class="q-mr-xs self-center"
+            />
+            <span class="self-center">{{ loginError }}</span>
+          </div>
           <q-btn
             flat
             no-caps
@@ -76,10 +86,13 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { object, string } from 'yup'
 import { Form, Field, configure } from 'vee-validate'
 import { useAuthStore } from 'stores/auth-store'
 
+const router = useRouter()
 const authStore = useAuthStore()
 
 const userSchema = object({
@@ -87,10 +100,17 @@ const userSchema = object({
   password: string().required('Password is required').min(6)
 })
 
+let loginError = ref()
+
 function onSubmit (values: any, actions: any) {
   authStore.login(values)
-    .finally(() => {
+    .then((response) => {
+      console.log(response)
       actions.resetForm()
+      router.push('/')
+    })
+    .catch((error) => {
+      loginError.value = error
     })
 }
 

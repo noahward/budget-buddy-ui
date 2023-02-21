@@ -1,35 +1,32 @@
 import { api } from 'boot/axios'
-import { useRouter } from 'vue-router'
 import { defineStore } from 'pinia'
 
-const router = useRouter()
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    // TODO: Check if the below line is bad practice
-    user: JSON.parse(localStorage.getItem('user') as string),
-    redirectUrl: undefined
+    user: JSON.parse(localStorage.getItem('user') || '{}')
   }),
   actions: {
     async login (userInfo: object) {
       try {
-        const user = await api.post('/login', { userInfo })
+        const user = await api.post('/login', userInfo)
         this.user = user
         localStorage.setItem('user', JSON.stringify(user))
-        router.push(this.redirectUrl || '/')
+        return { status: 'success', msg: 'User logged in' }
       } catch (error) {
         console.error(error)
-        router.push('/login')
+        throw error
       }
     },
     async logout () {
       try {
         await api.post('/logout', { token: this.user.token })
+        this.user = null
+        return { status: 'success', msg: 'User logged out' }
       } catch (error) {
         console.error(error)
+        throw error
       }
-      this.user = null
-      router.push('/login')
     }
   }
 })
