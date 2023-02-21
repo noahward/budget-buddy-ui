@@ -84,7 +84,10 @@
     </q-card>
     <div class="q-mt-sm">
       <span>New to Budget Buddy? </span>
-      <a href="/register" class="text-blue-9">Create an account</a>
+      <a
+        href="/register"
+        class="text-blue-9"
+      >Create an account</a>
     </div>
   </q-page>
 </template>
@@ -104,7 +107,7 @@ const userSchema = object({
   password: string().required('Password is required')
 })
 
-let loginError = ref()
+const loginError = ref()
 
 function onSubmit (values: any, actions: any) {
   authStore.login(values)

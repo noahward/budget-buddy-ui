@@ -84,7 +84,10 @@
     </q-card>
     <div class="q-mt-sm">
       <span>Already have an account? </span>
-      <a href="/login" class="text-blue-9">Sign in</a>
+      <a
+        href="/login"
+        class="text-blue-9"
+      >Sign in</a>
     </div>
   </q-page>
 </template>
@@ -104,7 +107,7 @@ const userSchema = object({
   password: string().required('Password is required').min(6, 'Password must be at least 6 characters')
 })
 
-let registerError = ref()
+const registerError = ref()
 
 function onSubmit (values: any, actions: any) {
   authStore.register(values)
