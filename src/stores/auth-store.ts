@@ -1,7 +1,8 @@
-import { defineStore } from 'pinia'
-// TODO: How to import router in store
-// import { router } from 'router'
 import { api } from 'boot/axios'
+import { useRouter } from 'vue-router'
+import { defineStore } from 'pinia'
+
+const router = useRouter()
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -15,10 +16,10 @@ export const useAuthStore = defineStore('auth', {
         const user = await api.post('/login', { userInfo })
         this.user = user
         localStorage.setItem('user', JSON.stringify(user))
-        // router.push(this.redirectUrl || '/')
+        router.push(this.redirectUrl || '/')
       } catch (error) {
         console.error(error)
-        // router.push('/login')
+        router.push('/login')
       }
     },
     async logout () {
@@ -28,7 +29,7 @@ export const useAuthStore = defineStore('auth', {
         console.error(error)
       }
       this.user = null
-      // router.push('/login')
+      router.push('/login')
     }
   }
 })
