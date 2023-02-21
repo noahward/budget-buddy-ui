@@ -18,6 +18,17 @@ export const useAuthStore = defineStore('auth', {
         throw error
       }
     },
+    async register (userInfo: object) {
+      try {
+        const user = await api.post('/register', userInfo)
+        this.user = user
+        localStorage.setItem('user', JSON.stringify(user))
+        return { status: 'success', msg: 'User registered and logged in' }
+      } catch (error) {
+        console.error(error)
+        throw error
+      }
+    },
     async logout () {
       try {
         await api.post('/logout', { token: this.user.token })
