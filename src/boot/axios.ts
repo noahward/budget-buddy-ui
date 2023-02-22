@@ -15,7 +15,7 @@ declare module '@vue/runtime-core' {
 // "export default () => {}" function below (which runs individually
 // for each client)
 interface APIConfig {
-  baseURL: any;
+  baseURL: string | undefined;
   Authorization?: string
 }
 
