@@ -61,13 +61,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Form } from 'vee-validate'
-import { useRouter } from 'vue-router'
 import { object, string } from 'yup'
 import { camelizeKeys, decamelizeKeys } from 'humps'
 import { useAuthStore } from 'stores/auth-store'
 import InputField from 'components/InputField.vue'
 
-const router = useRouter()
 const authStore = useAuthStore()
 
 const userSchema = object({
@@ -85,13 +83,8 @@ interface RegisterErrors {
 }
 const registerErrors = ref<RegisterErrors>()
 
-function onSubmit (values: object, actions: any) {
+function onSubmit (values: object) {
   authStore.register(decamelizeKeys(values))
-    .then((response) => {
-      console.log(response)
-      actions.resetForm()
-      router.push('/')
-    })
     .catch((error) => {
       registerErrors.value = camelizeKeys(error.response.data)
     })

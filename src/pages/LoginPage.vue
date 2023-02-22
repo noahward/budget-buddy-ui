@@ -49,13 +49,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Form } from 'vee-validate'
-import { useRouter } from 'vue-router'
 import { object, string } from 'yup'
 import { camelizeKeys } from 'humps'
 import { useAuthStore } from 'stores/auth-store'
 import InputField from 'components/InputField.vue'
 
-const router = useRouter()
 const authStore = useAuthStore()
 
 const userSchema = object({
@@ -69,13 +67,8 @@ interface LoginErrors {
 }
 const loginErrors = ref<LoginErrors>()
 
-function onSubmit (values: object, actions: any) {
+function onSubmit (values: object) {
   authStore.login(values)
-    .then((response) => {
-      console.log(response)
-      actions.resetForm()
-      router.push('/')
-    })
     .catch((error) => {
       loginErrors.value = camelizeKeys(error.response.data)
     })

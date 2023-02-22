@@ -11,7 +11,7 @@ export const useAuthStore = defineStore('auth', {
         const user = await api.post('/auth/login', userInfo)
         this.user = user
         localStorage.setItem('user', JSON.stringify(user))
-        return { status: 'success', msg: 'User logged in' }
+        this.router.push('/accounts')
       } catch (error) {
         console.error(error)
         throw error
@@ -22,7 +22,7 @@ export const useAuthStore = defineStore('auth', {
         const user = await api.post('/auth/register', userInfo)
         this.user = user
         localStorage.setItem('user', JSON.stringify(user))
-        return { status: 'success', msg: 'User registered and logged in' }
+        this.router.push('/accounts')
       } catch (error) {
         console.error(error)
         throw error
@@ -32,7 +32,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         await api.post('/auth/logout', { token: this.user.token })
         this.user = null
-        return { status: 'success', msg: 'User logged out' }
+        this.router.push('/login')
       } catch (error) {
         console.error(error)
         throw error
