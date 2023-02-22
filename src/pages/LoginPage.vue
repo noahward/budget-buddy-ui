@@ -67,7 +67,7 @@ interface LoginErrors {
   email?: Array<string>;
   nonFieldErrors?: Array<string>;
 }
-let loginErrors = ref<LoginErrors>()
+const loginErrors = ref<LoginErrors>()
 
 function onSubmit (values: object, actions: any) {
   authStore.login(values)

@@ -17,7 +17,11 @@
         class="q-mr-xs self-center"
       />
       <span class="self-center">{{ errorMessage }}</span>
-      <span v-for="err in errors" :key="err" class="self-center">{{ err }}</span>
+      <span
+        v-for="err in errors"
+        :key="err"
+        class="self-center"
+      >{{ err }}</span>
     </div>
   </div>
 </template>
@@ -34,7 +38,7 @@ interface PropTypes {
 }
 const props = defineProps<PropTypes>()
 
-const { errorMessage, value, handleChange } = 
+const { errorMessage, value, handleChange } =
 useField<string>(
   toRef(props, 'name'),
   undefined,

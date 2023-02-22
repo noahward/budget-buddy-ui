@@ -80,13 +80,13 @@ const userSchema = object({
 interface RegisterErrors {
   email?: Array<string>;
   firstName?: Array<string>;
-  lastName?: Array<string>; 
+  lastName?: Array<string>;
   nonFieldErrors?: Array<string>;
 }
-let registerErrors = ref<RegisterErrors>()
+const registerErrors = ref<RegisterErrors>()
 
 function onSubmit (values: object, actions: any) {
-  authStore.register(decamelizeKeys(values))  
+  authStore.register(decamelizeKeys(values))
     .then((response) => {
       console.log(response)
       actions.resetForm()
