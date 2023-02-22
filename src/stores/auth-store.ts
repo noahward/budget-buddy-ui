@@ -1,7 +1,6 @@
 import { api } from 'boot/axios'
 import { defineStore } from 'pinia'
 
-
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: JSON.parse(localStorage.getItem('user') || '{}')
@@ -9,7 +8,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async login (userInfo: object) {
       try {
-        const user = await api.post('/login', userInfo)
+        const user = await api.post('/auth/login', userInfo)
         this.user = user
         localStorage.setItem('user', JSON.stringify(user))
         return { status: 'success', msg: 'User logged in' }
@@ -20,7 +19,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async register (userInfo: object) {
       try {
-        const user = await api.post('/register', userInfo)
+        const user = await api.post('/auth/register', userInfo)
         this.user = user
         localStorage.setItem('user', JSON.stringify(user))
         return { status: 'success', msg: 'User registered and logged in' }
@@ -31,7 +30,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async logout () {
       try {
-        await api.post('/logout', { token: this.user.token })
+        await api.post('/auth/logout', { token: this.user.token })
         this.user = null
         return { status: 'success', msg: 'User logged out' }
       } catch (error) {
