@@ -11,67 +11,21 @@
       </q-card-section>
       <q-card-section>
         <Form
-          v-slot="{ errors }"
           :validation-schema="userSchema"
           @submit="onSubmit"
         >
-          <Field
-            v-slot="{ value, field }"
+          <InputField
             name="email"
-          >
-            <q-input
-              outlined
-              dense
-              label="Email"
-              type="email"
-              :model-value="value"
-              v-bind="field"
-              :class="{ 'q-mb-md': !errors.email }"
-            />
-          </Field>
-          <div
-            v-if="errors.email"
-            class="text-red text-caption row justify-start q-mb-sm"
-          >
-            <q-icon
-              name="error"
-              class="q-mr-xs self-center"
-            />
-            <span class="self-center">{{ errors.email }}</span>
-          </div>
-          <Field
-            v-slot="{ value, field }"
+            kind="email"
+            label="Email"
+            :errors="loginErrors?.email"
+          />
+          <InputField
             name="password"
-          >
-            <q-input
-              outlined
-              dense
-              label="Password"
-              type="password"
-              :model-value="value"
-              v-bind="field"
-            />
-          </Field>
-          <div
-            v-if="errors.password"
-            class="text-red text-caption row justify-start"
-          >
-            <q-icon
-              name="error"
-              class="q-mr-xs self-center"
-            />
-            <span class="self-center">{{ errors.password }}</span>
-          </div>
-          <div
-            v-if="loginError"
-            class="text-red text-caption row justify-start"
-          >
-            <q-icon
-              name="error"
-              class="q-mr-xs self-center"
-            />
-            <span class="self-center">{{ loginError }}</span>
-          </div>
+            kind="password"
+            label="Password"
+            :errors="loginErrors?.nonFieldErrors"
+          />
           <q-btn
             flat
             no-caps
@@ -94,10 +48,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { Form } from 'vee-validate'
 import { useRouter } from 'vue-router'
 import { object, string } from 'yup'
-import { Form, Field, configure } from 'vee-validate'
+import { camelizeKeys } from 'humps'
 import { useAuthStore } from 'stores/auth-store'
+import InputField from 'components/InputField.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -107,9 +63,13 @@ const userSchema = object({
   password: string().required('Password is required')
 })
 
-const loginError = ref()
+interface LoginErrors {
+  email?: Array<string>;
+  nonFieldErrors?: Array<string>;
+}
+let loginErrors = ref<LoginErrors>()
 
-function onSubmit (values: any, actions: any) {
+function onSubmit (values: object, actions: any) {
   authStore.login(values)
     .then((response) => {
       console.log(response)
@@ -117,14 +77,9 @@ function onSubmit (values: any, actions: any) {
       router.push('/')
     })
     .catch((error) => {
-      loginError.value = error
+      loginErrors.value = camelizeKeys(error.response.data)
     })
 }
-
-configure({
-  validateOnChange: false,
-  validateOnModelUpdate: false
-})
 </script>
 
 <style lang="scss">

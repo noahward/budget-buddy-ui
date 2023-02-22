@@ -11,73 +11,39 @@
       </q-card-section>
       <q-card-section>
         <Form
-          v-slot="{ errors }"
           :validation-schema="userSchema"
           @submit="onSubmit"
         >
-          <Field
-            v-slot="{ value, field }"
+          <InputField
             name="email"
-          >
-            <q-input
-              outlined
-              dense
-              label="Email"
-              type="email"
-              :model-value="value"
-              v-bind="field"
-              :class="{ 'q-mb-md': !errors.email }"
-            />
-          </Field>
-          <div
-            v-if="errors.email"
-            class="text-red text-caption row justify-start q-mb-sm"
-          >
-            <q-icon
-              name="error"
-              class="q-mr-xs self-center"
-            />
-            <span class="self-center">{{ errors.email }}</span>
-          </div>
-          <Field
-            v-slot="{ value, field }"
+            kind="email"
+            label="Email"
+            :errors="registerErrors?.email"
+          />
+          <InputField
+            name="firstName"
+            kind="text"
+            label="First Name"
+            :errors="registerErrors?.firstName"
+          />
+          <InputField
+            name="lastName"
+            kind="text"
+            label="Last Name"
+            :errors="registerErrors?.lastName"
+          />
+          <InputField
             name="password"
-          >
-            <q-input
-              outlined
-              dense
-              label="Password"
-              type="password"
-              :model-value="value"
-              v-bind="field"
-            />
-          </Field>
-          <div
-            v-if="errors.password"
-            class="text-red text-caption row justify-start"
-          >
-            <q-icon
-              name="error"
-              class="q-mr-xs self-center"
-            />
-            <span class="self-center">{{ errors.password }}</span>
-          </div>
-          <div
-            v-if="registerError"
-            class="text-red text-caption row justify-start"
-          >
-            <q-icon
-              name="error"
-              class="q-mr-xs self-center"
-            />
-            <span class="self-center">{{ registerError }}</span>
-          </div>
+            kind="password"
+            label="Password"
+            :errors="registerErrors?.nonFieldErrors"
+          />
           <q-btn
             flat
             no-caps
             type="submit"
             class="bg-primary text-white full-width q-mb-md q-mt-lg"
-            label="Sign In"
+            label="Register"
           />
         </Form>
       </q-card-section>
@@ -94,37 +60,42 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { Form } from 'vee-validate'
 import { useRouter } from 'vue-router'
 import { object, string } from 'yup'
-import { Form, Field, configure } from 'vee-validate'
+import { camelizeKeys, decamelizeKeys } from 'humps'
 import { useAuthStore } from 'stores/auth-store'
+import InputField from 'components/InputField.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 const userSchema = object({
   email: string().required('Email is required').email('Enter a valid email address'),
+  firstName: string().required('First name is required'),
+  lastName: string().required('First name is required'),
   password: string().required('Password is required').min(6, 'Password must be at least 6 characters')
 })
 
-const registerError = ref()
+interface RegisterErrors {
+  email?: Array<string>;
+  firstName?: Array<string>;
+  lastName?: Array<string>; 
+  nonFieldErrors?: Array<string>;
+}
+let registerErrors = ref<RegisterErrors>()
 
-function onSubmit (values: any, actions: any) {
-  authStore.register(values)
+function onSubmit (values: object, actions: any) {
+  authStore.register(decamelizeKeys(values))  
     .then((response) => {
       console.log(response)
       actions.resetForm()
       router.push('/')
     })
     .catch((error) => {
-      registerError.value = error
+      registerErrors.value = camelizeKeys(error.response.data)
     })
 }
-
-configure({
-  validateOnChange: false,
-  validateOnModelUpdate: false
-})
 </script>
 
 <style lang="scss">
