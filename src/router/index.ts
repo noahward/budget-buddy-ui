@@ -8,8 +8,7 @@ import {
 } from 'vue-router'
 import routes from './routes'
 
-
-export default route(function ( { store } ) {
+export default route(function ({ store }) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
@@ -20,7 +19,7 @@ export default route(function ( { store } ) {
     history: createHistory(process.env.VUE_ROUTER_BASE)
   })
 
-  Router.beforeEach(( to, from ) => {
+  Router.beforeEach((to, from) => {
     const { user } = useAuthStore(store)
     if (to.meta.requiresAuth && !user.data) return '/login'
     else if (!to.meta.requiresAuth && user.data) return from

@@ -1,5 +1,5 @@
 <template>
-  <q-header class="bg-primary">
+  <q-header :class="authStore.user.data ? 'bg-primary' : 'transparent'">
     <q-toolbar class="nav-container">
       <q-btn
         flat
@@ -9,35 +9,35 @@
         aria-label="Menu"
         size="20px"
         class="text-white"
-        :class="{ 'hidden': $q.screen.gt.xs }"
+        :class="{ 'hidden': $q.screen.gt.xs, 'invisible': !authStore.user.data }"
         @click="toggleDrawer"
       />
       <div
-        class="text-white text-h5"
-        :class="$q.screen.lt.md ? 'text-weight-medium' : 'text-weight-bolder'"
+        class="text-h5"
+        :class="authStore.user.data ? 'text-white' : 'text-primary'"
       >
-        Budget Buddy
+        <span :class="$q.screen.lt.md ? 'text-weight-medium' : 'text-weight-bolder'">Budget</span>
+        <span :class="$q.screen.lt.md ? 'text-weight-regular' : 'text-weight-medium'">Buddy</span>
       </div>
       <q-tabs
         no-caps
-        :class="{ 'hidden': $q.screen.lt.sm }"
+        :class="{ 'hidden': $q.screen.lt.sm, 'invisible': !authStore.user.data }"
       >
         <q-route-tab
           v-for="link in linksList"
           :key="link"
           :to="link.link"
           :label="link.title"
-          class="text-white"
         />
       </q-tabs>
       <q-btn
         flat
         round
         class="btn--no-hover"
+        :class="{ 'invisible': !authStore.user.data }"
+        href="profile"
       >
-        <q-avatar outlined>
-          <img src="https://cdn.quasar.dev/img/avatar.png">
-        </q-avatar>
+        <q-avatar icon="account_circle" />
       </q-btn>
     </q-toolbar>
   </q-header>
@@ -58,8 +58,10 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useAuthStore } from 'stores/auth-store'
 import EssentialLink from 'components/EssentialLink.vue'
 
+const authStore = useAuthStore()
 const drawerOpen = ref(false)
 const linksList = [
   {
@@ -93,6 +95,7 @@ const linksList = [
     link: '/import'
   }
 ]
+
 function toggleDrawer () {
   drawerOpen.value = !drawerOpen.value
 }
