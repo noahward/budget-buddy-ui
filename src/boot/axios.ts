@@ -13,7 +13,7 @@ const api = axios.create({ baseURL: import.meta.env.VITE_API_BASE_URL })
 export default boot(({ app, store }) => {
   const { user } = useAuthStore(store)
   if (user.data) {
-    api.defaults.headers.common['Authorization'] = `Token ${user.data.token}`
+    api.defaults.headers.common.Authorization = `Token ${user.data.token}`
   }
 
   // TODO: Are boolean environment variables possible?

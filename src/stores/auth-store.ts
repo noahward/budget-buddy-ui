@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async logout () {
       try {
-        await api.post('/auth/logout', { token: this.user.token })
+        await api.post('/auth/logout/')
         this.user = null
         this.router.push('/login')
       } catch (error) {
