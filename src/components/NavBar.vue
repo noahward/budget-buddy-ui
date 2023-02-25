@@ -1,5 +1,5 @@
 <template>
-  <q-header :class="authStore.user.data ? 'bg-primary' : 'transparent'">
+  <q-header :class="isAuthenticated ? 'bg-primary' : 'transparent'">
     <q-toolbar class="nav-container">
       <q-btn
         flat
@@ -9,19 +9,19 @@
         aria-label="Menu"
         size="20px"
         class="text-white"
-        :class="{ 'hidden': $q.screen.gt.xs, 'invisible': !authStore.user.data }"
+        :class="{ 'hidden': $q.screen.gt.xs, 'invisible': !isAuthenticated }"
         @click="toggleDrawer"
       />
       <div
         class="text-h5"
-        :class="authStore.user.data ? 'text-white' : 'text-primary'"
+        :class="isAuthenticated ? 'text-white' : 'text-primary'"
       >
         <span :class="$q.screen.lt.md ? 'text-weight-medium' : 'text-weight-bolder'">Budget</span>
         <span :class="$q.screen.lt.md ? 'text-weight-regular' : 'text-weight-medium'">Buddy</span>
       </div>
       <q-tabs
         no-caps
-        :class="{ 'hidden': $q.screen.lt.sm, 'invisible': !authStore.user.data }"
+        :class="{ 'hidden': $q.screen.lt.sm, 'invisible': !isAuthenticated }"
       >
         <q-route-tab
           v-for="link in linksList"
@@ -34,7 +34,7 @@
         flat
         round
         class="btn--no-hover"
-        :class="{ 'invisible': !authStore.user.data }"
+        :class="{ 'invisible': !isAuthenticated }"
         href="profile"
       >
         <q-avatar icon="account_circle" />
@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from 'stores/auth-store'
 import EssentialLink from 'components/EssentialLink.vue'
 
@@ -95,6 +95,11 @@ const linksList = [
     link: '/import'
   }
 ]
+
+// TODO: Move this to the auth store for re-use in other components
+const isAuthenticated = computed(() => {
+  return Object.keys(authStore.user).length !== 0
+})
 
 function toggleDrawer () {
   drawerOpen.value = !drawerOpen.value
