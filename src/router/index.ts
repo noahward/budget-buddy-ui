@@ -21,8 +21,9 @@ export default route(function ({ store }) {
 
   Router.beforeEach((to, from) => {
     const { user } = useAuthStore(store)
-    if (to.meta.requiresAuth && !user.data) return '/login'
-    else if (!to.meta.requiresAuth && user.data) return from
+    const isAuthenticated = Object.keys(user).length !== 0
+    if (to.meta.requiresAuth && !isAuthenticated) return '/login'
+    else if (!to.meta.requiresAuth && isAuthenticated) return from
   })
 
   return Router
