@@ -19,9 +19,11 @@ export default boot(({ router, store }) => {
   api.interceptors.response.use(
     response => response,
     error => {
-      if (error.response.status === 401) {
+      if (error.response.status === 401 && router.currentRoute.value.fullPath !== '/login') {
         router.push('/login')
+        return Promise.reject(error)
       }
+      return Promise.reject(error)
     }
   )
 
