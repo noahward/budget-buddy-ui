@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth', {
           this.router.push('/accounts')
         })
         .catch((error) => {
-          return error
+          throw error
         })
     },
     async register (userInfo: object) {
@@ -32,19 +32,19 @@ export const useAuthStore = defineStore('auth', {
           this.router.push('/accounts')
         })
         .catch((error) => {
-          console.error(error)
           throw error
         })
     },
+    // TODO: Should user reset be completed regardless of error?
     async logout () {
       return api.post('/auth/logout/')
+        .then(() => {
+          this.router.push('/login')
+        })
         .catch((error) => {
-          console.log('Auth store error')
-          console.error(error)
           throw error
         })
         .finally(() => {
-          this.router.push('/login')
           LocalStorage.remove('user')
           this.user = {}
         })
