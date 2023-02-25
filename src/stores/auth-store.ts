@@ -1,6 +1,7 @@
 import { api } from 'boot/axios'
-import { defineStore } from 'pinia'
 import { User } from '../models/user.model'
+import { defineStore } from 'pinia'
+import { LocalStorage } from 'quasar'
 
 interface UserState {
   user: User | Record<string, never>;
@@ -8,42 +9,45 @@ interface UserState {
 
 export const useAuthStore = defineStore('auth', {
   state: (): UserState => ({
-    user: JSON.parse(localStorage.getItem('user') || '{}')
+    user: LocalStorage.getItem('user') || {}
   }),
   actions: {
+    // TODO: Abstract common logic between register and login functions
     async login (userInfo: object) {
-      try {
-        const user = await api.post('/auth/login', userInfo)
-        this.user = user.data
-        localStorage.setItem('user', JSON.stringify(user))
-        this.router.push('/accounts')
-      } catch (error) {
-        console.error(error)
-        throw error
-      }
+      return api.post('/auth/login', userInfo)
+        .then((response) => {
+          this.user = response.data
+          LocalStorage.set('user', response.data)
+          this.router.push('/accounts')
+        })
+        .catch((error) => {
+          return error
+        })
     },
     async register (userInfo: object) {
-      try {
-        const user = await api.post('/auth/register', userInfo)
-        this.user = user.data
-        localStorage.setItem('user', JSON.stringify(user))
-        this.router.push('/accounts')
-      } catch (error) {
-        console.error(error)
-        throw error
-      }
+      return api.post('/auth/register', userInfo)
+        .then((response) => {
+          this.user = response.data
+          LocalStorage.set('user', response.data)
+          this.router.push('/accounts')
+        })
+        .catch((error) => {
+          console.error(error)
+          throw error
+        })
     },
     async logout () {
-      try {
-        await api.post('/auth/logout/')
-        this.router.push('/login')
-      } catch (error) {
-        console.error(error)
-        throw error
-      } finally {
-        localStorage.removeItem('user')
-        this.user = {}
-      }
+      return api.post('/auth/logout/')
+        .catch((error) => {
+          console.log('Auth store error')
+          console.error(error)
+          throw error
+        })
+        .finally(() => {
+          this.router.push('/login')
+          LocalStorage.remove('user')
+          this.user = {}
+        })
     }
   }
 })
