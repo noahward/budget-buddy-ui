@@ -6,6 +6,6 @@ export interface UserData {
 }
 
 export interface User {
-  user: Record<string, UserData>;
+  user: UserData;
   token: string;
 }
