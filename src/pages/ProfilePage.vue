@@ -24,7 +24,10 @@
           </q-badge>
         </q-avatar>
       </q-btn>
-      <div class="text-h6 text-weight-medium self-center q-ml-md" v-if="isAuthenticated">
+      <div
+        v-if="isAuthenticated"
+        class="text-h6 text-weight-medium self-center q-ml-md"
+      >
         {{ authStore.user.profile.firstName }} {{ authStore.user.profile.lastName }}
       </div>
     </div>
@@ -37,7 +40,10 @@
           <div class="text-caption">
             Display Name
           </div>
-          <div class="text-weight-bold" v-if="isAuthenticated">
+          <div
+            v-if="isAuthenticated"
+            class="text-weight-bold"
+          >
             {{ authStore.user.profile.firstName }} {{ authStore.user.profile.lastName }}
           </div>
         </div>
@@ -55,7 +61,10 @@
           <div class="text-caption">
             Email
           </div>
-          <div class="text-weight-bold" v-if="isAuthenticated">
+          <div
+            v-if="isAuthenticated"
+            class="text-weight-bold"
+          >
             {{ authStore.user.profile.email }}
           </div>
         </div>

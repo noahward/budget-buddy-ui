@@ -13,13 +13,13 @@ const api = axios.create({ baseURL: import.meta.env.VITE_API_BASE_URL })
 export default boot(({ router, store }) => {
   const { user } = useAuthStore(store)
   if (Object.keys(user).length !== 0) {
-    api.defaults.headers.common.Authorization = `Token ${user.token}`
+    api.defaults.headers.common.Authorization = `Token ${user.token.key}`
   }
 
   api.interceptors.response.use(
     response => response,
     error => {
-      if (error.response.status === 401 && router.currentRoute.value.fullPath !== '/login') {
+      if (error.response.status === 401 && router.currentRoute.value.meta.requiresAuth) {
         router.push('/login')
         return Promise.reject(error)
       }
