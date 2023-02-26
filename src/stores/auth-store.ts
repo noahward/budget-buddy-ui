@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('auth', {
       return api.post('/auth/login', userInfo)
         .then((response) => {
           this.user = camelizeKeys(response.data) as User
-          LocalStorage.set('user', response.data)
+          LocalStorage.set('user', camelizeKeys(response.data))
           this.router.push('/accounts')
         })
         .catch((error) => {
@@ -29,7 +29,7 @@ export const useAuthStore = defineStore('auth', {
       return api.post('/auth/register', userInfo)
         .then((response) => {
           this.user = camelizeKeys(response.data) as User
-          LocalStorage.set('user', response.data)
+          LocalStorage.set('user', camelizeKeys(response.data))
           this.router.push('/accounts')
         })
         .catch((error) => {
