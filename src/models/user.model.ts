@@ -1,11 +1,16 @@
 export interface UserData {
   id: number;
   email: string;
-  first_name: string;
-  last_name:string;
+  firstName: string;
+  lastName:string;
+}
+
+export interface TokenData {
+  key: string;
+  expiry: string;
 }
 
 export interface User {
-  user: UserData;
-  token: string;
+  profile: UserData;
+  token: TokenData;
 }

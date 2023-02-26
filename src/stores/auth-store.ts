@@ -2,6 +2,7 @@ import { api } from 'boot/axios'
 import { User } from '../models/user.model'
 import { defineStore } from 'pinia'
 import { LocalStorage } from 'quasar'
+import { camelizeKeys } from 'humps'
 
 interface UserState {
   user: User | Record<string, never>;
@@ -16,7 +17,7 @@ export const useAuthStore = defineStore('auth', {
     async login (userInfo: object) {
       return api.post('/auth/login', userInfo)
         .then((response) => {
-          this.user = response.data
+          this.user = camelizeKeys(response.data) as User
           LocalStorage.set('user', response.data)
           this.router.push('/accounts')
         })
@@ -27,7 +28,7 @@ export const useAuthStore = defineStore('auth', {
     async register (userInfo: object) {
       return api.post('/auth/register', userInfo)
         .then((response) => {
-          this.user = response.data
+          this.user = camelizeKeys(response.data) as User
           LocalStorage.set('user', response.data)
           this.router.push('/accounts')
         })

@@ -25,7 +25,7 @@
         </q-avatar>
       </q-btn>
       <div class="text-h6 text-weight-medium self-center q-ml-md" v-if="isAuthenticated">
-        {{ authStore.user.user.first_name }} {{ authStore.user.user.last_name }}
+        {{ authStore.user.profile.firstName }} {{ authStore.user.profile.lastName }}
       </div>
     </div>
     <q-card
@@ -38,7 +38,7 @@
             Display Name
           </div>
           <div class="text-weight-bold" v-if="isAuthenticated">
-            {{ authStore.user.user.first_name }} {{ authStore.user.user.last_name }}
+            {{ authStore.user.profile.firstName }} {{ authStore.user.profile.lastName }}
           </div>
         </div>
         <q-btn
@@ -56,7 +56,7 @@
             Email
           </div>
           <div class="text-weight-bold" v-if="isAuthenticated">
-            {{ authStore.user.user.email }}
+            {{ authStore.user.profile.email }}
           </div>
         </div>
         <q-btn
