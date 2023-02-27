@@ -1,8 +1,8 @@
 import { api } from 'boot/axios'
-import { User, UserData } from '../models/user.model'
 import { defineStore } from 'pinia'
 import { LocalStorage } from 'quasar'
-import { camelizeKeys } from 'humps'
+import { User, UserData } from '../models/user.model'
+import { camelizeKeys, decamelizeKeys } from 'humps'
 
 interface UserState {
   user: User | Record<string, never>;
@@ -15,7 +15,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     // TODO: Abstract common logic between register and login functions
     async login (userInfo: object) {
-      return api.post('/auth/login', userInfo)
+      return api.post('/auth/login', decamelizeKeys(userInfo))
         .then((response) => {
           this.user = camelizeKeys(response.data) as User
           LocalStorage.set('user', camelizeKeys(response.data))
@@ -26,7 +26,7 @@ export const useAuthStore = defineStore('auth', {
         })
     },
     async register (userInfo: object) {
-      return api.post('/auth/register', userInfo)
+      return api.post('/auth/register', decamelizeKeys(userInfo))
         .then((response) => {
           this.user = camelizeKeys(response.data) as User
           LocalStorage.set('user', camelizeKeys(response.data))
@@ -51,7 +51,7 @@ export const useAuthStore = defineStore('auth', {
         })
     },
     async updateUser (userInfo: object) {
-      return api.patch('/auth/user', userInfo)
+      return api.patch('/auth/user', decamelizeKeys(userInfo))
         .then((response) => {
           this.user.profile = camelizeKeys(response.data) as UserData
           LocalStorage.set('user', this.user)

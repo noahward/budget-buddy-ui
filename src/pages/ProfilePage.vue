@@ -11,7 +11,10 @@
         class="btn--no-hover padding-none"
       >
         <q-avatar size="50px">
-          <img src="https://cdn.quasar.dev/img/avatar.png">
+          <q-icon
+            name="account_circle"
+            size="50px"
+          />
           <q-badge
             floating
             rounded
@@ -152,12 +155,12 @@
 </template>
 
 <script setup lang="ts">
-import { Form } from 'vee-validate'
+import { camelizeKeys } from 'humps'
 import { useAuthStore } from 'stores/auth-store'
 import { ref, computed } from 'vue'
 import { ApiUserErrors } from '../models/user.model'
 import { object, string } from 'yup'
-import { camelizeKeys, decamelizeKeys } from 'humps'
+import { Form, FormActions } from 'vee-validate'
 import InputField from 'components/InputField.vue'
 
 const editDialog = ref(false)
@@ -176,8 +179,8 @@ const isAuthenticated = computed(() => {
 
 const updateErrors = ref<ApiUserErrors>()
 
-function updateUserInfo (values: object, actions: any) {
-  authStore.updateUser(decamelizeKeys(values))
+function updateUserInfo (values: object, actions: FormActions<Record<string, unknown>>) {
+  authStore.updateUser(values)
     .then(() => {
       actions.resetForm()
       editDialog.value = false
