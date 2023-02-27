@@ -155,6 +155,7 @@
 import { Form } from 'vee-validate'
 import { useAuthStore } from 'stores/auth-store'
 import { ref, computed } from 'vue'
+import { ApiUserErrors } from '../models/user.model'
 import { object, string } from 'yup'
 import { camelizeKeys, decamelizeKeys } from 'humps'
 import InputField from 'components/InputField.vue'
@@ -173,14 +174,7 @@ const isAuthenticated = computed(() => {
   return Object.keys(authStore.user).length !== 0
 })
 
-// TODO: Create a model for this and use it in login & register
-interface UpdateErrors {
-  email?: Array<string>;
-  firstName?: Array<string>;
-  lastName?: Array<string>;
-  nonFieldErrors?: Array<string>;
-}
-const updateErrors = ref<UpdateErrors>()
+const updateErrors = ref<ApiUserErrors>()
 
 function updateUserInfo (values: object, actions: any) {
   authStore.updateUser(decamelizeKeys(values))

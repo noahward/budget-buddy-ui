@@ -52,6 +52,7 @@ import { Form } from 'vee-validate'
 import { object, string } from 'yup'
 import { camelizeKeys } from 'humps'
 import { useAuthStore } from 'stores/auth-store'
+import { ApiUserErrors } from '../models/user.model'
 import InputField from 'components/InputField.vue'
 
 const authStore = useAuthStore()
@@ -61,11 +62,7 @@ const userSchema = object({
   password: string().required('Password is required')
 })
 
-interface LoginErrors {
-  email?: Array<string>;
-  nonFieldErrors?: Array<string>;
-}
-const loginErrors = ref<LoginErrors>()
+const loginErrors = ref<ApiUserErrors>()
 
 function onSubmit (values: object) {
   authStore.login(values)

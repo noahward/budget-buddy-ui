@@ -64,6 +64,7 @@ import { Form } from 'vee-validate'
 import { object, string } from 'yup'
 import { camelizeKeys, decamelizeKeys } from 'humps'
 import { useAuthStore } from 'stores/auth-store'
+import { ApiUserErrors } from '../models/user.model'
 import InputField from 'components/InputField.vue'
 
 const authStore = useAuthStore()
@@ -75,13 +76,7 @@ const userSchema = object({
   password: string().required('Password is required').min(6, 'Password must be at least 6 characters')
 })
 
-interface RegisterErrors {
-  email?: Array<string>;
-  firstName?: Array<string>;
-  lastName?: Array<string>;
-  nonFieldErrors?: Array<string>;
-}
-const registerErrors = ref<RegisterErrors>()
+const registerErrors = ref<ApiUserErrors>()
 
 function onSubmit (values: object) {
   authStore.register(decamelizeKeys(values))
