@@ -38,27 +38,6 @@
       <div class="row justify-between items-center q-my-md">
         <div>
           <div class="text-caption">
-            Display Name
-          </div>
-          <div
-            v-if="isAuthenticated"
-            class="text-weight-bold"
-          >
-            {{ authStore.user.profile.firstName }} {{ authStore.user.profile.lastName }}
-          </div>
-        </div>
-        <q-btn
-          dense
-          flat
-          no-caps
-          class="text-white bg-primary"
-        >
-          <span class="q-mx-sm">Edit</span>
-        </q-btn>
-      </div>
-      <div class="row justify-between items-center q-my-md">
-        <div>
-          <div class="text-caption">
             Email
           </div>
           <div
@@ -69,12 +48,15 @@
           </div>
         </div>
         <q-btn
-          dense
           flat
-          no-caps
-          class="text-white bg-primary"
+          round
+          class="text-primary"
+          @click="editDialog = true"
         >
-          <span class="q-mx-sm">Edit</span>
+          <q-icon
+            name="edit"
+            size="xs"
+          />
         </q-btn>
       </div>
       <div class="row justify-between items-center q-my-md">
@@ -82,18 +64,13 @@
           <div class="text-caption">
             Password
           </div>
-          <div class="text-weight-bold">
-            ∙∙∙∙∙∙∙∙
-          </div>
+          <q-icon
+            v-for="i in 6"
+            :key="i"
+            name="fiber_manual_record"
+            size="7px"
+          />
         </div>
-        <q-btn
-          dense
-          flat
-          no-caps
-          class="text-white bg-primary"
-        >
-          <span class="q-mx-sm">Change</span>
-        </q-btn>
       </div>
       <q-btn
         dense
@@ -105,18 +82,116 @@
         <span class="q-mx-sm">Sign out</span>
       </q-btn>
     </q-card>
+
+    <q-dialog
+      v-model="editDialog"
+      persistent
+    >
+      <q-card style="min-width: 350px">
+        <Form
+          :initial-values="authStore.user.profile"
+          :validation-schema="userSchema"
+          @submit="updateUserInfo"
+        >
+          <div class="text-h6 text-weight-bold q-mx-md q-mt-md">
+            Update Profile
+          </div>
+          <q-card-section class="column">
+            <div class="column">
+              <div class="text-caption1 text-weight-medium q-mb-xs">
+                Email
+              </div>
+              <InputField
+                kind="email"
+                name="email"
+                :errors="updateErrors?.email"
+              />
+            </div>
+            <div class="column">
+              <div class="text-caption1 text-weight-medium q-mb-xs">
+                First Name
+              </div>
+              <InputField
+                kind="text"
+                name="firstName"
+                :errors="updateErrors?.firstName"
+              />
+            </div>
+            <div class="column">
+              <div class="text-caption1 text-weight-medium q-mb-xs">
+                Last Name
+              </div>
+              <InputField
+                kind="text"
+                name="lastName"
+                :errors="updateErrors?.lastName"
+              />
+            </div>
+          </q-card-section>
+          <q-card-actions
+            align="right"
+            class="text-primary"
+          >
+            <q-btn
+              v-close-popup
+              no-caps
+              flat
+              label="Cancel"
+            />
+            <q-btn
+              no-caps
+              flat
+              label="Update"
+              type="submit"
+            />
+          </q-card-actions>
+        </Form>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { Form } from 'vee-validate'
 import { useAuthStore } from 'stores/auth-store'
+import { ref, computed } from 'vue'
+import { object, string } from 'yup'
+import { camelizeKeys, decamelizeKeys } from 'humps'
+import InputField from 'components/InputField.vue'
+
+const editDialog = ref(false)
+
+const userSchema = object({
+  email: string().email('Enter a valid email address'),
+  firstName: string(),
+  lastName: string()
+})
 
 const authStore = useAuthStore()
 
 const isAuthenticated = computed(() => {
   return Object.keys(authStore.user).length !== 0
 })
+
+// TODO: Create a model for this and use it in login & register
+interface UpdateErrors {
+  email?: Array<string>;
+  firstName?: Array<string>;
+  lastName?: Array<string>;
+  nonFieldErrors?: Array<string>;
+}
+const updateErrors = ref<UpdateErrors>()
+
+function updateUserInfo (values: object, actions: any) {
+  authStore.updateUser(decamelizeKeys(values))
+    .then(() => {
+      actions.resetForm()
+      editDialog.value = false
+    })
+    .catch((error) => {
+      updateErrors.value = camelizeKeys(error.response.data)
+    })
+}
 
 function logoutUser () {
   authStore.logout()

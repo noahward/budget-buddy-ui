@@ -33,7 +33,7 @@ import { toRef, computed } from 'vue'
 interface PropTypes {
   name: string;
   kind: 'email' | 'password' | 'text';
-  label: string;
+  label?: string;
   errors?: Array<string>;
 }
 const props = defineProps<PropTypes>()

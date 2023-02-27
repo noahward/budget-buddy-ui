@@ -1,5 +1,5 @@
 import { api } from 'boot/axios'
-import { User } from '../models/user.model'
+import { User, UserData } from '../models/user.model'
 import { defineStore } from 'pinia'
 import { LocalStorage } from 'quasar'
 import { camelizeKeys } from 'humps'
@@ -48,6 +48,16 @@ export const useAuthStore = defineStore('auth', {
         .finally(() => {
           LocalStorage.remove('user')
           this.user = {}
+        })
+    },
+    async updateUser (userInfo: object) {
+      return api.patch('/auth/user', userInfo)
+        .then((response) => {
+          this.user.profile = camelizeKeys(response.data) as UserData
+          LocalStorage.set('user', this.user)
+        })
+        .catch((error) => {
+          throw error
         })
     }
   }
