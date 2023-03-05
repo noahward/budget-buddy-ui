@@ -18,6 +18,7 @@ export const useAuthStore = defineStore('auth', {
       return api.post('/auth/login', decamelizeKeys(userInfo))
         .then((response) => {
           this.user = camelizeKeys(response.data) as User
+          api.defaults.headers.common.Authorization = `Token ${response.data.token.key}`
           LocalStorage.set('user', camelizeKeys(response.data))
           this.router.push('/accounts')
         })
@@ -29,6 +30,7 @@ export const useAuthStore = defineStore('auth', {
       return api.post('/auth/register', decamelizeKeys(userInfo))
         .then((response) => {
           this.user = camelizeKeys(response.data) as User
+          api.defaults.headers.common.Authorization = `Token ${response.data.token.key}`
           LocalStorage.set('user', camelizeKeys(response.data))
           this.router.push('/accounts')
         })
@@ -36,10 +38,10 @@ export const useAuthStore = defineStore('auth', {
           throw error
         })
     },
-    // TODO: Should user reset be completed regardless of error?
     async logout () {
       return api.post('/auth/logout/')
         .then(() => {
+          delete api.defaults.headers.common.Authorization
           this.router.push('/login')
         })
         .catch((error) => {
