@@ -139,6 +139,7 @@
               v-close-popup
               no-caps
               flat
+              class="text-grey-2"
               label="Cancel"
             />
             <q-btn
