@@ -9,15 +9,15 @@
     <span
       class="text-weight-bold text-primary q-mt-sm"
       :class="$q.screen.lt.sm ? 'text-h6' : 'text-h5'"
-    >$1,314.38</span>
+    >${{ amount }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
-// TODO: Add amount into here once I figure out best way to do that on the backend
 interface PropTypes {
   name: string;
   nickname?: string;
+  amount: number;
 }
-defineProps<PropTypes>()
+withDefaults(defineProps<PropTypes>(), { amount: 0, nickname: '', name: '' })
 </script>
