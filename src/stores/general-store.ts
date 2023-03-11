@@ -17,6 +17,15 @@ export const useGeneralStore = defineStore('general', {
         .catch((error) => {
           throw error
         })
+    },
+    async createAccount (accountInfo: Account) {
+      return api.post('/accounts', accountInfo)
+        .then((response) => {
+          this.accounts.push(response.data)
+        })
+        .catch((error) => {
+          throw error
+        })
     }
   }
 })
