@@ -2,7 +2,7 @@ import { api } from 'boot/axios'
 import { defineStore } from 'pinia'
 import { Account } from '../models/account.model'
 
-export const useGeneralStore = defineStore('general', {
+export const useAccountStore = defineStore('account', {
   state: () => {
     return {
       accounts: [] as Account[]

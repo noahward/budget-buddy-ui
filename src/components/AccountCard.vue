@@ -136,12 +136,12 @@
 <script setup lang="ts">
 import InputField from 'components/InputField.vue'
 import { camelizeKeys } from 'humps'
-import { useGeneralStore } from 'stores/general-store'
+import { useAccountStore } from 'stores/account-store'
 import { Form, FormActions } from 'vee-validate'
 import { ref, toRef } from 'vue'
 import accountSchema, { Account, ApiAccountErrors } from '../models/account.model'
 
-const generalStore = useGeneralStore()
+const accountStore = useAccountStore()
 const editDialog = ref(false)
 const confirmDialog = ref(false)
 const accountOptions = [
@@ -164,7 +164,7 @@ const updateErrors = ref<ApiAccountErrors>()
 
 function updateAccountInfo (values: Account, actions: FormActions<Record<string, unknown>>) {
   values.kind = accountType.value
-  generalStore.updateAccount(values)
+  accountStore.updateAccount(values)
     .then(() => {
       actions.resetForm()
       editDialog.value = false
@@ -175,7 +175,7 @@ function updateAccountInfo (values: Account, actions: FormActions<Record<string,
 }
 
 function deleteAccount (accountId: number) {
-  generalStore.deleteAccount(accountId)
+  accountStore.deleteAccount(accountId)
     .then(() => {
       editDialog.value = false
     })

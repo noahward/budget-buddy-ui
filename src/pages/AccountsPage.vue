@@ -22,7 +22,7 @@
         </q-btn>
       </div>
       <div>
-        <content-card
+        <account-card
           v-for="account in spendingAccounts"
           :id="account.id"
           :key="account.id"
@@ -55,7 +55,7 @@
         </q-btn>
       </div>
       <div>
-        <content-card
+        <account-card
           v-for="account in savingAccounts"
           :id="account.id"
           :key="account.id"
@@ -144,15 +144,15 @@
 </template>
 
 <script setup lang="ts">
-import ContentCard from 'components/ContentCard.vue'
+import AccountCard from 'src/components/AccountCard.vue'
 import InputField from 'components/InputField.vue'
 import { camelizeKeys } from 'humps'
-import { useGeneralStore } from 'stores/general-store'
+import { useAccountStore } from 'stores/account-store'
 import { Form, FormActions } from 'vee-validate'
 import { computed, ref } from 'vue'
 import accountSchema, { Account, ApiAccountErrors } from '../models/account.model'
 
-const generalStore = useGeneralStore()
+const accountStore = useAccountStore()
 const addDialog = ref(false)
 const accountType = ref('spending')
 const accountOptions = [
@@ -160,21 +160,21 @@ const accountOptions = [
   { label: 'Saving', value: 'saving' }
 ]
 
-generalStore.getAccounts()
+accountStore.getAccounts()
 
 const spendingAccounts = computed(() => {
-  return generalStore.accounts.filter(account => account.kind === 'spending')
+  return accountStore.accounts.filter(account => account.kind === 'spending')
 })
 
 const savingAccounts = computed(() => {
-  return generalStore.accounts.filter(account => account.kind === 'saving')
+  return accountStore.accounts.filter(account => account.kind === 'saving')
 })
 
 const updateErrors = ref<ApiAccountErrors>()
 
 function createAccount (values: Account, actions: FormActions<Record<string, unknown>>) {
   values.kind = accountType.value
-  generalStore.createAccount(values)
+  accountStore.createAccount(values)
     .then(() => {
       actions.resetForm()
       addDialog.value = false
