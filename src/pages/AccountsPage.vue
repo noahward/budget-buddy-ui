@@ -24,10 +24,12 @@
       <div>
         <content-card
           v-for="account in spendingAccounts"
+          :id="account.id"
           :key="account.id"
           :name="account.name"
           :nickname="account.nickname"
           :amount="account.amount"
+          kind="spending"
           class="q-my-xs"
         />
       </div>
@@ -55,10 +57,12 @@
       <div>
         <content-card
           v-for="account in savingAccounts"
+          :id="account.id"
           :key="account.id"
           :name="account.name"
           :nickname="account.nickname"
           :amount="account.amount"
+          kind="saving"
           class="q-my-xs"
         />
       </div>
@@ -169,8 +173,6 @@ const savingAccounts = computed(() => {
 const updateErrors = ref<ApiAccountErrors>()
 
 function createAccount (values: Account, actions: FormActions<Record<string, unknown>>) {
-  console.log(values)
-
   values.kind = accountType.value
   generalStore.createAccount(values)
     .then(() => {
