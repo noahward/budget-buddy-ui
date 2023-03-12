@@ -47,7 +47,7 @@
             />
             <div class="column">
               <div class="text-caption1 text-weight-medium q-mb-xs">
-                Account Name
+                Name
               </div>
               <InputField
                 kind="text"
@@ -67,7 +67,7 @@
             </div>
             <div class="column">
               <div class="text-caption1 text-weight-medium q-mb-xs">
-                Last Name
+                Balance
               </div>
               <InputField
                 kind="text"
