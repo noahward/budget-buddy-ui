@@ -1,6 +1,7 @@
 import { api } from 'boot/axios'
 import { defineStore } from 'pinia'
 import { Account } from '../models/account.model'
+import type { Ref } from 'vue'
 
 export const useAccountStore = defineStore('account', {
   state: () => {
@@ -45,6 +46,18 @@ export const useAccountStore = defineStore('account', {
         .then(() => {
           this.accounts = this.accounts.filter((acc) => acc.id !== accountId)
         })
+        .catch((error) => {
+          throw error
+        })
+    },
+    async uploadTransactions (accountId: number, file: File) {
+      const formData = new FormData()
+      formData.append('file', file)
+      return api.post(`/accounts/${accountId}/transactions`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
         .catch((error) => {
           throw error
         })
