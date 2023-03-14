@@ -87,12 +87,6 @@ const linksList = [
     caption: 'Categorize your transactions',
     icon: 'category',
     link: '/classify'
-  },
-  {
-    title: 'Import',
-    caption: 'Load in your account transactions',
-    icon: 'file_upload',
-    link: '/import'
   }
 ]
 
