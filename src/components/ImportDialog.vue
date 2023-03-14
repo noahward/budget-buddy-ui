@@ -40,18 +40,24 @@
         label="Choose a file"
         class="q-mt-md select"
       />
-
-      <q-btn
-        flat
-        dense
-        :loading="uploading"
-        no-caps
-        class="text-white bg-primary q-mt-md"
-        @click="uploadFile"
-      >
-        <span class="q-mx-sm">Upload</span>
-      </q-btn>
     </q-card-section>
+    <q-card-actions align="right">
+      <q-btn
+        v-close-popup
+        no-caps
+        flat
+        label="Cancel"
+        color="grey-2"
+      />
+      <q-btn
+        no-caps
+        flat
+        label="Upload"
+        color="primary"
+        :loading="uploading"
+        @click="uploadFile"
+      />
+    </q-card-actions>
   </q-card>
 </template>
 
@@ -110,6 +116,8 @@ const accountError = ref(false)
 const fileError = ref(false)
 const updateErrors = ref()
 
+const emit = defineEmits(['inFocus', 'closeDialog'])
+
 function uploadFile () {
   uploading.value = true
   if (selectedAccount.value === null) {
@@ -125,6 +133,7 @@ function uploadFile () {
       })
       .finally(() => {
         uploading.value = false
+        emit('closeDialog')
       })
   }
   uploading.value = false

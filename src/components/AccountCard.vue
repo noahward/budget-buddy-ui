@@ -161,19 +161,20 @@
         :label="props.name"
         :nickname="props.nickname"
         :value="props.id"
+        @close-dialog="importDialog = false"
       />
     </q-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
+import ImportDialog from 'components/ImportDialog.vue'
 import InputField from 'components/InputField.vue'
 import { camelizeKeys } from 'humps'
 import { useAccountStore } from 'stores/account-store'
 import { Form, FormActions } from 'vee-validate'
 import { ref, toRef } from 'vue'
 import accountSchema, { Account, ApiAccountErrors } from '../models/account.model'
-import ImportDialog from 'components/ImportDialog.vue'
 
 export interface PropTypes {
   id: number;
