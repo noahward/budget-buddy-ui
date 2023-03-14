@@ -9,8 +9,30 @@
           round
           icon="more_horiz"
           class="q-mr-sm text-grey-2"
-          @click="editDialog = true"
-        />
+        >
+          <q-menu>
+            <q-list dense>
+              <q-item
+                v-close-popup
+                clickable
+                @click="editDialog = true"
+              >
+                <q-item-section>
+                  <q-item-label>Edit</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item
+                v-close-popup
+                clickable
+                @click="importDialog = true"
+              >
+                <q-item-section>
+                  <q-item-label>Import transactions</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
       </div>
       <div class="column">
         <span class="text-subtitle1 text-weight-medium">{{ name }}</span>
@@ -130,6 +152,17 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <q-dialog
+      v-model="importDialog"
+      persistent
+    >
+      <ImportDialog
+        :label="props.name"
+        :nickname="props.nickname"
+        :value="props.id"
+      />
+    </q-dialog>
   </div>
 </template>
 
@@ -140,23 +173,26 @@ import { useAccountStore } from 'stores/account-store'
 import { Form, FormActions } from 'vee-validate'
 import { ref, toRef } from 'vue'
 import accountSchema, { Account, ApiAccountErrors } from '../models/account.model'
+import ImportDialog from 'components/ImportDialog.vue'
 
-const accountStore = useAccountStore()
-const editDialog = ref(false)
-const confirmDialog = ref(false)
-const accountOptions = [
-  { label: 'Spending', value: 'spending' },
-  { label: 'Saving', value: 'saving' }
-]
-
-interface PropTypes {
+export interface PropTypes {
   id: number;
   name: string;
   nickname?: string;
   amount: number;
   kind: string;
 }
+
 const props = withDefaults(defineProps<PropTypes>(), { amount: 0, nickname: '', name: '' })
+
+const accountStore = useAccountStore()
+const editDialog = ref(false)
+const confirmDialog = ref(false)
+const importDialog = ref(false)
+const accountOptions = [
+  { label: 'Spending', value: 'spending' },
+  { label: 'Saving', value: 'saving' }
+]
 
 const accountType = toRef(props, 'kind')
 
