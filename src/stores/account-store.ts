@@ -1,7 +1,6 @@
 import { api } from 'boot/axios'
 import { defineStore } from 'pinia'
 import { Account } from '../models/account.model'
-import type { Ref } from 'vue'
 
 export const useAccountStore = defineStore('account', {
   state: () => {
