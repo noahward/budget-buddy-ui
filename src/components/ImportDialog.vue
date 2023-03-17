@@ -31,6 +31,16 @@
           </q-item>
         </template>
       </q-select>
+      <div
+        v-if="errors.account"
+        class="text-red text-caption row justify-start"
+      >
+        <q-icon
+          name="error"
+          class="q-mr-xs self-center"
+        />
+        <span class="self-center">Account is required</span>
+      </div>
 
       <q-file
         v-model="selectedFile"
@@ -40,6 +50,24 @@
         label="Choose a file"
         class="q-mt-md select"
       />
+      <div
+        v-if="errors.file || Object.keys(errors.upload).length !== 0"
+        class="text-red text-caption row justify-start"
+      >
+        <q-icon
+          name="error"
+          class="q-mr-xs self-center"
+        />
+        <span
+          v-if="errors.file"
+          class="self-center"
+        >Transaction file is required</span>
+        <span
+          v-for="err in errors.upload"
+          :key="err"
+          class="self-center"
+        >{{ err }}</span>
+      </div>
     </q-card-section>
     <q-card-actions align="right">
       <q-btn
@@ -112,28 +140,34 @@ function filterAccounts (_val: unknown, update: any, _abort: unknown) {
   })
 }
 
-const accountError = ref(false)
-const fileError = ref(false)
-const updateErrors = ref()
+const errors = ref({
+  account: false,
+  file: false,
+  upload: {}
+})
 
 const emit = defineEmits(['inFocus', 'closeDialog'])
 
 function uploadFile () {
   uploading.value = true
   if (selectedAccount.value === null) {
-    accountError.value = true
+    errors.value.account = true
   }
   if (selectedFile.value === null) {
-    fileError.value = true
+    errors.value.file = true
   }
   if (selectedFile.value !== null && selectedAccount.value !== null) {
+    errors.value.file = false
+    errors.value.account = false
     return accountStore.uploadTransactions(selectedAccount.value.value, selectedFile.value)
+      .then(() => {
+        emit('closeDialog')
+      })
       .catch((error) => {
-        updateErrors.value = camelizeKeys(error.response.data)
+        errors.value.upload = camelizeKeys(error.response.data)
       })
       .finally(() => {
         uploading.value = false
-        emit('closeDialog')
       })
   }
   uploading.value = false
