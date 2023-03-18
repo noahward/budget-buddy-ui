@@ -1,7 +1,7 @@
 import { api } from 'boot/axios'
+import { decamelizeKeys, camelizeKeys } from 'humps'
 import { defineStore } from 'pinia'
-import { Account } from '../models/account.model'
-import { decamelizeKeys } from 'humps'
+import { Account, UpdateAccount, CreateAccount } from '../models/account.model'
 
 export const useAccountStore = defineStore('account', {
   state: () => {
@@ -13,25 +13,25 @@ export const useAccountStore = defineStore('account', {
     async getAccounts () {
       return api.get('/accounts')
         .then((response) => {
-          this.accounts = response.data
+          this.accounts = camelizeKeys(response.data) as Account[]
         })
         .catch((error) => {
           throw error
         })
     },
-    async createAccount (accountInfo: Account) {
+    async createAccount (accountInfo: CreateAccount) {
       return api.post('/accounts', decamelizeKeys(accountInfo))
         .then((response) => {
-          this.accounts.push(response.data)
+          this.accounts.push(camelizeKeys(response.data) as Account)
         })
         .catch((error) => {
           throw error
         })
     },
-    async updateAccount (accountInfo: Account) {
+    async updateAccount (accountInfo: UpdateAccount) {
       return api.patch(`/accounts/${accountInfo.id}`, accountInfo)
         .then((response) => {
-          const updAccountInfo = response.data
+          const updAccountInfo = camelizeKeys(response.data) as Account
           const targetAcc = this.accounts.find((acc) => acc.id === updAccountInfo.id)
           if (targetAcc) {
             Object.assign(targetAcc, updAccountInfo)

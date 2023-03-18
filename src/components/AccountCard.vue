@@ -53,7 +53,7 @@
       <q-card style="min-width: 350px">
         <Form
           :initial-values="props"
-          :validation-schema="accountSchema"
+          :validation-schema="updateAccountSchema"
           @submit="updateAccountInfo"
         >
           <div class="text-h6 text-weight-bold q-mx-md q-mt-md">
@@ -162,9 +162,11 @@ import ImportDialog from 'components/ImportDialog.vue'
 import InputField from 'components/InputField.vue'
 import { camelizeKeys } from 'humps'
 import { useAccountStore } from 'stores/account-store'
-import { Form, FormActions } from 'vee-validate'
+import { Form } from 'vee-validate'
 import { ref, toRef } from 'vue'
-import accountSchema, { Account, ApiAccountErrors } from '../models/account.model'
+import { number, object, string } from 'yup'
+import { getSubmitFn } from '../helpers/validationHelper'
+import { ApiAccountErrors } from '../models/account.model'
 
 interface AccountProps {
   id: number;
@@ -173,6 +175,13 @@ interface AccountProps {
   balance: number;
   kind: 'saving' | 'spending';
 }
+
+const updateAccountSchema = object({
+  id: number().required(),
+  name: string(),
+  nickname: string(),
+  kind: string<'saving' | 'spending'>()
+})
 
 const props = defineProps<AccountProps>()
 
@@ -189,17 +198,17 @@ const accountType = toRef(props, 'kind')
 
 const updateErrors = ref<ApiAccountErrors>()
 
-function updateAccountInfo (values: Account, actions: FormActions<Record<string, unknown>>) {
+const updateAccountInfo = getSubmitFn(updateAccountSchema, (values) => {
+  values.id = props.id
   values.kind = accountType.value
   accountStore.updateAccount(values)
     .then(() => {
-      actions.resetForm()
       editDialog.value = false
     })
     .catch((error) => {
       updateErrors.value = camelizeKeys(error.response.data)
     })
-}
+})
 
 function deleteAccount (accountId: number) {
   accountStore.deleteAccount(accountId)

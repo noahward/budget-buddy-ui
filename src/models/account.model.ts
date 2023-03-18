@@ -1,26 +1,27 @@
-import { number, object, string, InferType } from 'yup'
-
-const accountSchema = object({
-  id: number(),
-  name: string().required('Account name is required'),
-  nickname: string(),
-  initialBalance: number(),
-  balance: number(),
-  kind: string()
-})
-
-export interface Account {
+interface Account {
   id: number;
   name: string;
   nickname?: string;
-  initialBalance?: number;
-  balance: number;
   kind: 'saving' | 'spending';
+  balance: number;
+  initialBalance: number;
 }
 
-export type AccountSchema = InferType<typeof accountSchema>
+interface CreateAccount {
+  name: string;
+  nickname?: string;
+  initialBalance?: number;
+  kind?: 'saving' | 'spending';
+}
 
-export interface ApiAccountErrors {
+interface UpdateAccount {
+  id: number;
+  name?: string;
+  nickname?: string;
+  kind?: 'saving' | 'spending';
+}
+
+interface ApiAccountErrors {
   name?: Array<string>;
   nickname?: Array<string>;
   kind?: Array<string>;
@@ -30,4 +31,4 @@ export interface ApiAccountErrors {
   detail?: string;
 }
 
-export default accountSchema
+export type { Account, UpdateAccount, CreateAccount, ApiAccountErrors }

@@ -73,7 +73,7 @@
       >
         <q-card style="min-width: 350px">
           <Form
-            :validation-schema="accountSchema"
+            :validation-schema="createAccountSchema"
             @submit="createAccount"
           >
             <div class="text-h6 text-weight-bold q-mx-md q-mt-md">
@@ -144,13 +144,22 @@
 </template>
 
 <script setup lang="ts">
-import AccountCard from 'src/components/AccountCard.vue'
 import InputField from 'components/InputField.vue'
 import { camelizeKeys } from 'humps'
+import AccountCard from 'src/components/AccountCard.vue'
 import { useAccountStore } from 'stores/account-store'
-import { Form, FormActions } from 'vee-validate'
+import { Form } from 'vee-validate'
 import { computed, ref } from 'vue'
-import accountSchema, { Account, ApiAccountErrors } from '../models/account.model'
+import { number, object, string } from 'yup'
+import { getSubmitFn } from '../helpers/validationHelper'
+import { ApiAccountErrors } from '../models/account.model'
+
+const createAccountSchema = object({
+  name: string().required('Account name is required'),
+  nickname: string(),
+  initialBalance: number(),
+  kind: string<'saving' | 'spending'>()
+})
 
 const accountStore = useAccountStore()
 const addDialog = ref(false)
@@ -172,18 +181,16 @@ const savingAccounts = computed(() => {
 
 const updateErrors = ref<ApiAccountErrors>()
 
-function createAccount (values: Account, actions: FormActions<Record<string, unknown>>) {
+const createAccount = getSubmitFn(createAccountSchema, (values) => {
   values.kind = accountType.value
-  console.log(values)
   accountStore.createAccount(values)
     .then(() => {
-      actions.resetForm()
       addDialog.value = false
     })
     .catch((error) => {
       updateErrors.value = camelizeKeys(error.response.data)
     })
-}
+})
 </script>
 
 <style scoped lang="scss">
