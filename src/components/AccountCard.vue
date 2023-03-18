@@ -323,13 +323,18 @@ function deleteAccount (accountId: number) {
 const balanceErrors = ref(false)
 
 function updateBalance () {
-  if (isNaN(incrementAmount.value) || incrementAmount.value <= 0 || incrementAmount.value > 100000000) {
+  let amount = Number(incrementAmount.value)
+  if (isNaN(amount) || amount <= 0 || amount > 100000000) {
     balanceErrors.value = true
   } else {
+    if (incrementOperator.value === 'subtract') {
+      amount = -Math.abs(amount)
+    }
     balanceErrors.value = false
-    return accountStore.uploadSingleTransaction(props.id, incrementAmount.value)
+    return accountStore.uploadSingleTransaction(props.id, amount)
       .then(() => {
         balanceDialog.value = false
+        incrementAmount.value = 100
       })
       .catch((error) => {
         console.error(error)

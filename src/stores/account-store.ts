@@ -2,6 +2,7 @@ import { api } from 'boot/axios'
 import { decamelizeKeys, camelizeKeys } from 'humps'
 import { defineStore } from 'pinia'
 import { Account, UpdateAccount, CreateAccount } from '../models/account.model'
+import { Transaction } from '../models/transaction.model'
 
 export const useAccountStore = defineStore('account', {
   state: () => {
@@ -58,12 +59,29 @@ export const useAccountStore = defineStore('account', {
           'Content-Type': 'multipart/form-data'
         }
       })
+        .then((response) => {
+          const transactionArr = response.data
+          let amount = 0
+          transactionArr.forEach((transaction: Transaction) => {
+            amount += transaction.amount
+          })
+          const targetAcc = this.accounts.find((acc) => acc.id === accountId)
+          if (targetAcc) {
+            Object.assign(targetAcc, { balance: targetAcc.balance += amount })
+          }
+        })
         .catch((error) => {
           throw error
         })
     },
     async uploadSingleTransaction (accountId: number, amount: number) {
       return api.post(`/accounts/${accountId}/transactions`, { amount })
+        .then(() => {
+          const targetAcc = this.accounts.find((acc) => acc.id === accountId)
+          if (targetAcc) {
+            Object.assign(targetAcc, { balance: targetAcc.balance += amount })
+          }
+        })
         .catch((error) => {
           throw error
         })
