@@ -30,6 +30,15 @@
                   <q-item-label>Import transactions</q-item-label>
                 </q-item-section>
               </q-item>
+              <q-item
+                v-close-popup
+                clickable
+                @click="balanceDialog = true"
+              >
+                <q-item-section>
+                  <q-item-label>Modify Balance</q-item-label>
+                </q-item-section>
+              </q-item>
             </q-list>
           </q-menu>
         </q-btn>
@@ -43,7 +52,7 @@
       class="text-weight-bold text-primary q-mt-sm"
       :class="$q.screen.lt.sm ? 'text-h6' : 'text-h5'"
     >
-      ${{ balance }}
+      {{ balance.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) }}
     </span>
 
     <q-dialog
@@ -144,6 +153,76 @@
     </q-dialog>
 
     <q-dialog
+      v-model="balanceDialog"
+      persistent
+    >
+      <q-card style="width: 400px">
+        <div class="text-h6 text-weight-bold q-mx-md q-my-md">
+          Modify Balance
+        </div>
+
+        <div class="row q-px-md q-pb-md">
+          <q-btn-toggle
+            v-model="incrementOperator"
+            flat
+            no-caps
+            dense
+            class="q-my-xs"
+            text-color="grey-2"
+            toggle-color="primary"
+            :options="[
+              {label: 'Add', value: 'add'},
+              {label: 'Remove', value: 'subtract'}
+            ]"
+          />
+          <q-input
+            v-model="incrementAmount"
+            filled
+            type="number"
+            dense
+            class="full-width"
+          >
+            <template #prepend>
+              <span class="text-subtitle1">$</span>
+            </template>
+          </q-input>
+          <div class="column">
+            <span class="text-grey-2 text-caption q-mt-xs">
+              New Balance Preview: {{ balancePreview }}
+            </span>
+            <div
+              v-if="balanceErrors"
+              class="text-red text-caption row justify-start"
+            >
+              <q-icon
+                name="error"
+                class="q-mr-xs self-center"
+              />
+              <span class="self-center">Invalid amount</span>
+            </div>
+          </div>
+        </div>
+
+        <q-card-actions align="right">
+          <q-btn
+            v-close-popup
+            no-caps
+            flat
+            label="Cancel"
+            color="grey-2"
+          />
+          <q-btn
+            no-caps
+            flat
+            label="Update"
+            color="primary"
+            @click="updateBalance"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog
       v-model="importDialog"
       persistent
     >
@@ -163,7 +242,7 @@ import InputField from 'components/InputField.vue'
 import { camelizeKeys } from 'humps'
 import { useAccountStore } from 'stores/account-store'
 import { Form } from 'vee-validate'
-import { ref, toRef } from 'vue'
+import { computed, ref, toRef } from 'vue'
 import { number, object, string } from 'yup'
 import { getSubmitFn } from '../helpers/validationHelper'
 import { ApiAccountErrors } from '../models/account.model'
@@ -176,6 +255,8 @@ interface AccountProps {
   kind: 'saving' | 'spending';
 }
 
+const props = defineProps<AccountProps>()
+
 const updateAccountSchema = object({
   id: number().required(),
   name: string(),
@@ -183,18 +264,23 @@ const updateAccountSchema = object({
   kind: string<'saving' | 'spending'>()
 })
 
-const props = defineProps<AccountProps>()
-
 const accountStore = useAccountStore()
+
 const editDialog = ref(false)
 const confirmDialog = ref(false)
 const importDialog = ref(false)
+const balanceDialog = ref(false)
+
 const accountOptions = [
   { label: 'Spending', value: 'spending' },
   { label: 'Saving', value: 'saving' }
 ]
 
 const accountType = toRef(props, 'kind')
+const accountBalance = toRef(props, 'balance')
+
+const incrementOperator = ref<'add' | 'subtract'>('add')
+const incrementAmount = ref<number>(100)
 
 const updateErrors = ref<ApiAccountErrors>()
 
@@ -210,6 +296,16 @@ const updateAccountInfo = getSubmitFn(updateAccountSchema, (values) => {
     })
 })
 
+const balancePreview = computed(() => {
+  if (incrementOperator.value === 'add') {
+    const val = accountBalance.value + Number(incrementAmount.value)
+    return val.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+  } else {
+    const val = accountBalance.value - Number(incrementAmount.value)
+    return val.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+  }
+})
+
 function deleteAccount (accountId: number) {
   accountStore.deleteAccount(accountId)
     .then(() => {
@@ -221,5 +317,23 @@ function deleteAccount (accountId: number) {
     .finally(() => {
       confirmDialog.value = false
     })
+}
+
+const balanceErrors = ref(false)
+
+function updateBalance () {
+  if (isNaN(incrementAmount.value) || incrementAmount.value <= 0 || incrementAmount.value > 100000000) {
+    balanceErrors.value = true
+  } else {
+    balanceErrors.value = false
+    return accountStore.uploadSingleTransaction(props.id, incrementAmount.value)
+      .then(() => {
+        balanceDialog.value = false
+      })
+      .catch((error) => {
+        console.error(error)
+        balanceErrors.value = true
+      })
+  }
 }
 </script>

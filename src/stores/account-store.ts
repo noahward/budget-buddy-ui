@@ -61,6 +61,12 @@ export const useAccountStore = defineStore('account', {
         .catch((error) => {
           throw error
         })
+    },
+    async uploadSingleTransaction (accountId: number, amount: number) {
+      return api.post(`/accounts/${accountId}/transactions`, { amount })
+        .catch((error) => {
+          throw error
+        })
     }
   }
 })
