@@ -210,6 +210,7 @@
             flat
             label="Cancel"
             color="grey-2"
+            @click="balanceErrors = false; incrementAmount = 100"
           />
           <q-btn
             no-caps
