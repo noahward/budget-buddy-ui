@@ -1,6 +1,7 @@
 import { api } from 'boot/axios'
 import { defineStore } from 'pinia'
 import { Account } from '../models/account.model'
+import { decamelizeKeys } from 'humps'
 
 export const useAccountStore = defineStore('account', {
   state: () => {
@@ -19,7 +20,7 @@ export const useAccountStore = defineStore('account', {
         })
     },
     async createAccount (accountInfo: Account) {
-      return api.post('/accounts', accountInfo)
+      return api.post('/accounts', decamelizeKeys(accountInfo))
         .then((response) => {
           this.accounts.push(response.data)
         })

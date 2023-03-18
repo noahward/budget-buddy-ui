@@ -43,7 +43,7 @@
       class="text-weight-bold text-primary q-mt-sm"
       :class="$q.screen.lt.sm ? 'text-h6' : 'text-h5'"
     >
-      ${{ amount }}
+      ${{ balance }}
     </span>
 
     <q-dialog
@@ -85,16 +85,6 @@
                 kind="text"
                 name="nickname"
                 :errors="updateErrors?.nickname"
-              />
-            </div>
-            <div class="column">
-              <div class="text-caption1 text-weight-medium q-mb-xs">
-                Balance
-              </div>
-              <InputField
-                kind="text"
-                name="amount"
-                :errors="updateErrors?.amount"
               />
             </div>
           </q-card-section>
@@ -176,15 +166,15 @@ import { Form, FormActions } from 'vee-validate'
 import { ref, toRef } from 'vue'
 import accountSchema, { Account, ApiAccountErrors } from '../models/account.model'
 
-export interface PropTypes {
+interface AccountProps {
   id: number;
   name: string;
   nickname?: string;
-  amount: number;
-  kind: string;
+  balance: number;
+  kind: 'saving' | 'spending';
 }
 
-const props = withDefaults(defineProps<PropTypes>(), { amount: 0, nickname: '', name: '' })
+const props = defineProps<AccountProps>()
 
 const accountStore = useAccountStore()
 const editDialog = ref(false)

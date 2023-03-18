@@ -28,7 +28,7 @@
           :key="account.id"
           :name="account.name"
           :nickname="account.nickname"
-          :amount="account.amount"
+          :balance="account.balance"
           kind="spending"
           class="q-my-xs"
         />
@@ -61,7 +61,7 @@
           :key="account.id"
           :name="account.name"
           :nickname="account.nickname"
-          :amount="account.amount"
+          :balance="account.balance"
           kind="saving"
           class="q-my-xs"
         />
@@ -113,8 +113,8 @@
                 </div>
                 <InputField
                   kind="text"
-                  name="amount"
-                  :errors="updateErrors?.amount"
+                  name="initialBalance"
+                  :errors="updateErrors?.initialBalance"
                 />
               </div>
             </q-card-section>
@@ -154,7 +154,7 @@ import accountSchema, { Account, ApiAccountErrors } from '../models/account.mode
 
 const accountStore = useAccountStore()
 const addDialog = ref(false)
-const accountType = ref('spending')
+const accountType = ref<'saving' | 'spending'>('spending')
 const accountOptions = [
   { label: 'Spending', value: 'spending' },
   { label: 'Saving', value: 'saving' }
@@ -174,6 +174,7 @@ const updateErrors = ref<ApiAccountErrors>()
 
 function createAccount (values: Account, actions: FormActions<Record<string, unknown>>) {
   values.kind = accountType.value
+  console.log(values)
   accountStore.createAccount(values)
     .then(() => {
       actions.resetForm()
