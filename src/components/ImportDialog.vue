@@ -4,33 +4,13 @@
       Import Transactions
     </div>
     <q-card-section>
-      <q-select
-        v-model="selectedAccount"
-        filled
-        dense
-        label="Select an account"
-        class="q-mt-md select"
-        :options="accountOptions"
-        @filter="filterAccounts"
-      >
-        <template #option="scope">
-          <q-item v-bind="scope.itemProps">
-            <q-item-section>
-              <q-item-label>{{ scope.opt.label }}</q-item-label>
-              <q-item-label caption>
-                {{ scope.opt.nickname }}
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-        </template>
-        <template #no-option>
-          <q-item>
-            <q-item-section class="text-grey-2">
-              No results
-            </q-item-section>
-          </q-item>
-        </template>
-      </q-select>
+      <AccountDropdown
+        :label="props.label"
+        :nickname="props.nickname"
+        :value="props.value"
+        @account-select="(id) => selectedAccountId=id"
+      />
+
       <div
         v-if="errors.account"
         class="text-red text-caption row justify-start"
@@ -86,13 +66,15 @@
         @click="uploadFile"
       />
     </q-card-actions>
+    {{ selectedAccountId }}
   </q-card>
 </template>
 
 <script setup lang="ts">
+import AccountDropdown from 'components/AccountDropdown.vue'
 import { camelizeKeys } from 'humps'
 import { useAccountStore } from 'stores/account-store'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
 interface ImportProps {
   label: string;
@@ -102,43 +84,11 @@ interface ImportProps {
 
 const props = defineProps<ImportProps>()
 
-const selectedAccount = ref({
-  label: props.label,
-  nickname: props.nickname,
-  value: props.value
-})
+const selectedAccountId = ref<number | null>(props.value)
 
 const selectedFile = ref<File | null>(null)
 const accountStore = useAccountStore()
 const uploading = ref(false)
-
-const accountOptions = computed(() => {
-  const options = []
-  for (let i = 0; i < accountStore.accounts.length; i++) {
-    const accOption = {
-      label: accountStore.accounts[i].name,
-      nickname: accountStore.accounts[i].nickname,
-      value: accountStore.accounts[i].id
-    }
-    options.push(accOption)
-  }
-  return options
-})
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-function filterAccounts (_val: unknown, update: any, _abort: unknown) {
-  if (accountOptions.value.length !== 0) {
-    return update()
-  }
-
-  update(async () => {
-    try {
-      return await accountStore.getAccounts()
-    } catch (error) {
-      console.error(error)
-    }
-  })
-}
 
 const errors = ref({
   account: false,
@@ -150,16 +100,14 @@ const emit = defineEmits(['inFocus', 'closeDialog'])
 
 function uploadFile () {
   uploading.value = true
-  if (selectedAccount.value === null) {
+  if (selectedAccountId.value === null) {
     errors.value.account = true
-  }
-  if (selectedFile.value === null) {
+  } else if (selectedFile.value === null) {
     errors.value.file = true
-  }
-  if (selectedFile.value !== null && selectedAccount.value !== null) {
+  } else if (selectedFile.value !== null && selectedAccountId.value !== null) {
     errors.value.file = false
     errors.value.account = false
-    return accountStore.uploadTransactions(selectedAccount.value.value, selectedFile.value)
+    return accountStore.uploadTransactions(selectedAccountId.value, selectedFile.value)
       .then(() => {
         emit('closeDialog')
       })
