@@ -22,6 +22,10 @@
         </q-btn>
       </div>
       <div>
+        <span
+          v-if="spendingAccounts.length === 0"
+          class="q-ml-sm text-grey-2"
+        >No spending accounts to display!</span>
         <account-card
           v-for="account in spendingAccounts"
           :id="account.id"
@@ -55,6 +59,10 @@
         </q-btn>
       </div>
       <div>
+        <span
+          v-if="savingAccounts.length === 0"
+          class="q-ml-sm text-grey-2"
+        >No saving accounts to display!</span>
         <account-card
           v-for="account in savingAccounts"
           :id="account.id"
