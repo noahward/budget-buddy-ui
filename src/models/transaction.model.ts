@@ -6,7 +6,7 @@ interface Transaction {
   amount: number;
   user: number;
   account: number;
-  category: number;
+  category: string | null;
 }
 
 export type { Transaction }
