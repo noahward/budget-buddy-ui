@@ -4,8 +4,10 @@
       <div class="row">
         <div class="col-12 col-sm-5 column">
           <div class="column">
-            <AccountDropdown @account-select="(id) => selectedAccountId=id" />
-            <span class="text-grey-2 text-caption q-mt-xs">135 unclassified transactions for this account</span>
+            <AccountDropdown @account-select="(id) => transactionStore.getTransactions(id)" />
+            <span class="text-grey-2 text-caption q-mt-xs">
+              {{ nullCategoryCount }} unclassified transaction{{ nullCategoryCount !== 1 ? 's' : '' }} for this account
+            </span>
           </div>
           <q-card
             flat
@@ -59,9 +61,32 @@
         <span class="text-subtitle1 text-weight-medium q-mx-md">
           Quick Classify
         </span>
-        <q-card-section>
-          Temp
-        </q-card-section>
+        <div class="row">
+          <div
+            v-for="(categoryArr, index) in sortedCategories"
+            :key="index"
+            class="grid-col q-px-md q-pb-md q-pt-sm"
+          >
+            <div
+              v-for="category in categoryArr"
+              :key="category.id"
+            >
+              <q-btn
+                flat
+                no-caps
+                dense
+                align="left"
+                class="column q-my-sm full-width"
+                :class="category.detailedName === 'Other' ? 'bg-secondary text-white' : 'bg-white'"
+                :style="category.detailedName === 'Other' ? 'font-size: 14px;' : 'font-size: 13px;'"
+              >
+                <span
+                  class="q-mx-sm"
+                >{{ category.detailedName === 'Other' ? category.name : category.detailedName }}</span>
+              </q-btn>
+            </div>
+          </div>
+        </div>
       </q-card>
     </div>
   </q-page>
@@ -69,15 +94,56 @@
 
 <script setup lang="ts">
 import AccountDropdown from 'components/AccountDropdown.vue'
-import { ref } from 'vue'
+import { useCategoryStore } from 'stores/category-store'
+import { useTransactionStore } from 'stores/transaction-store'
+import { computed } from 'vue'
+import { Category } from '../models/category.model'
 
-const selectedAccountId = ref()
+const categoryStore = useCategoryStore()
+const transactionStore = useTransactionStore()
+
+categoryStore.getCategories()
+
+const nullCategoryCount = computed(() => {
+  const filtered = transactionStore.transactions.filter((itm) => {
+    return itm.category === null
+  })
+  return filtered.length
+})
+
+const sortedCategories = computed(() => {
+  const sorted: Array<Array<Category>> = []
+  const uniqueCategories = [...new Set(categoryStore.categories.map(cat => cat.name))]
+  uniqueCategories.forEach((category) => {
+    const subCategories = categoryStore.categories.filter((itm) => {
+      return itm.name === category
+    })
+    subCategories.sort((a, b) => {
+      if (a.detailedName === 'Other') {
+        return -1
+      } else if (b.detailedName === 'Other') {
+        return 1
+      } else {
+        return 0
+      }
+    })
+    sorted.push(subCategories)
+  })
+  return sorted
+})
 </script>
 
 <style scoped lang="scss">
 .container {
   @media (max-width: 990px) {
     padding: 0em 1em;
+  }
+}
+
+.grid-col {
+  width: 20%;
+  @media (max-width: 700px) {
+    width: 50%;
   }
 }
 </style>

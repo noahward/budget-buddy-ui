@@ -5,8 +5,4 @@ interface Category {
   user: number | null;
 }
 
-interface SortedCategories {
-  [key: string]: Category[]
-}
-
-export type { Category, SortedCategories }
+export type { Category }
