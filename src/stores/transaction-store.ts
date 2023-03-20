@@ -13,27 +13,7 @@ export const useTransactionStore = defineStore('transaction', {
     async getTransactions (accountId: number) {
       return api.get(`/accounts/${accountId}/transactions`)
         .then((response) => {
-          const transactionArr = camelizeKeys(response.data) as Transaction[]
-          transactionArr.forEach(obj => {
-            if (obj.dateClassified !== null) {
-              obj.dateClassified = new Date(obj.dateClassified)
-            }
-            obj.date = new Date(obj.date)
-          })
-          transactionArr.sort((a, b) => {
-            if (a.dateClassified === null && b.dateClassified === null) {
-              return 0
-            }
-            if (a.dateClassified === null) {
-              return 1
-            }
-            if (b.dateClassified === null) {
-              return -1
-            }
-            // @ts-expect-error   all dates have been converted to Date objects at this point
-            return b.dateClassified.getTime() - a.dateClassified.getTime()
-          })
-          this.transactions = transactionArr
+          this.transactions = camelizeKeys(response.data) as Transaction[]
         })
         .catch((error) => {
           throw error

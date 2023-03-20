@@ -111,6 +111,44 @@ const nullCategoryCount = computed(() => {
   return filtered.length
 })
 
+const sortedTransactions = computed(() => {
+  const transactions = transactionStore.transactions
+
+  transactions.forEach(obj => {
+    if (obj.date !== null) {
+      obj.date = new Date(obj.date)
+    }
+    if (obj.dateClassified !== null) {
+      obj.dateClassified = new Date(obj.dateClassified)
+    }
+  })
+
+  transactions.sort((a, b) => {
+    if (a.dateClassified === null && b.dateClassified === null) {
+      if (a.date === null && b.date === null) {
+        return 0
+      }
+      if (a.date === null) {
+        return -1
+      }
+      if (b.date === null) {
+        return 1
+      }
+      return new Date(a.date).getTime() - new Date(b.date).getTime()
+    }
+    if (a.dateClassified === null) {
+      return -1
+    }
+    if (b.dateClassified === null) {
+      return 1
+    }
+    return new Date(a.dateClassified).getTime() - new Date(b.dateClassified).getTime()
+  })
+
+  console.log(transactions)
+  return transactions
+})
+
 const sortedCategories = computed(() => {
   const sorted: Array<Array<Category>> = []
   const uniqueCategories = [...new Set(categoryStore.categories.map(cat => cat.name))]
