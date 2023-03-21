@@ -18,6 +18,19 @@ export const useTransactionStore = defineStore('transaction', {
         .catch((error) => {
           throw error
         })
+    },
+    async classifyTransaction (accountId: number, transactionId: number, categoryId: number) {
+      return api.patch(`/accounts/${accountId}/transactions/${transactionId}`, { category: categoryId })
+        .then((response) => {
+          const updTransaction = camelizeKeys(response.data) as Transaction
+          const targetTransaction = this.transactions.find((obj) => obj.id === updTransaction.id)
+          if (targetTransaction) {
+            Object.assign(targetTransaction, updTransaction)
+          }
+        })
+        .catch((error) => {
+          throw error
+        })
     }
   }
 })

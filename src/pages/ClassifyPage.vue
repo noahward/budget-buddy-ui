@@ -4,7 +4,7 @@
       <div class="row">
         <div class="col-12 col-sm-5 column">
           <div class="column">
-            <AccountDropdown @account-select="(id) => transactionStore.getTransactions(id)" />
+            <AccountDropdown @account-select="selectAccount" />
             <span class="text-grey-2 text-caption q-mt-xs">
               {{ unclassifiedTransactions.length }} unclassified transaction{{ unclassifiedTransactions.length !== 1 ? 's' : '' }} for this account
             </span>
@@ -90,6 +90,7 @@
                 class="column q-my-sm full-width"
                 :class="category.detailedName === 'Other' ? 'bg-secondary text-white' : 'bg-white'"
                 :style="category.detailedName === 'Other' ? 'font-size: 14px;' : 'font-size: 13px;'"
+                @click="submitClassification(category.id)"
               >
                 <span
                   class="q-mx-sm"
@@ -107,7 +108,7 @@
 import AccountDropdown from 'components/AccountDropdown.vue'
 import { useCategoryStore } from 'stores/category-store'
 import { useTransactionStore } from 'stores/transaction-store'
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { Category } from '../models/category.model'
 
 const dateOptions: Intl.DateTimeFormatOptions = {
@@ -118,6 +119,13 @@ const categoryStore = useCategoryStore()
 const transactionStore = useTransactionStore()
 
 categoryStore.getCategories()
+
+const selectedAccountId = ref<number | null>(null)
+
+function selectAccount (id: number) {
+  transactionStore.getTransactions(id)
+  selectedAccountId.value = id
+}
 
 const unclassifiedTransactions = computed(() => {
   return transactionStore.transactions
@@ -151,6 +159,16 @@ const sortedCategories = computed(() => {
   })
   return sorted
 })
+
+function submitClassification (categoryId: number) {
+  if (selectedAccountId.value !== null) {
+    return transactionStore.classifyTransaction(
+      selectedAccountId.value,
+      unclassifiedTransactions.value[0].id,
+      categoryId
+    )
+  }
+}
 </script>
 
 <style scoped lang="scss">

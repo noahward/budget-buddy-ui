@@ -4,10 +4,11 @@ interface Transaction {
   description: string;
   currencyCode: string;
   amount: number;
+  dateClassified: string | null;
   user: number;
   account: number;
-  category: string | null;
-  dateClassified: string | null;
+  categoryName: string | null;
+  categoryDetailedName: string | null;
 }
 
 export type { Transaction }
