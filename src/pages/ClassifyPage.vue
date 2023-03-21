@@ -6,7 +6,7 @@
           <div class="column">
             <AccountDropdown @account-select="(id) => transactionStore.getTransactions(id)" />
             <span class="text-grey-2 text-caption q-mt-xs">
-              {{ nullCategoryCount }} unclassified transaction{{ nullCategoryCount !== 1 ? 's' : '' }} for this account
+              {{ unclassifiedTransactions.length }} unclassified transaction{{ unclassifiedTransactions.length !== 1 ? 's' : '' }} for this account
             </span>
           </div>
           <q-card
@@ -39,14 +39,18 @@
               Recently Classified
             </span>
             <q-card-section>
+              <span
+                v-if="classifiedTransactions.length === 0"
+                class="text-caption text-grey-2"
+              >Nothing here to show.</span>
               <q-card
-                v-for="x in 4"
-                :key="x"
+                v-for="transaction in classifiedTransactions"
+                :key="transaction.id"
                 flat
                 class="q-mb-sm"
               >
                 <div class="q-pa-sm">
-                  Test
+                  {{ transaction }}
                 </div>
               </q-card>
             </q-card-section>
@@ -104,49 +108,16 @@ const transactionStore = useTransactionStore()
 
 categoryStore.getCategories()
 
-const nullCategoryCount = computed(() => {
-  const filtered = transactionStore.transactions.filter((itm) => {
-    return itm.category === null
-  })
-  return filtered.length
+const unclassifiedTransactions = computed(() => {
+  return transactionStore.transactions
+    .filter(transaction => transaction.dateClassified === null)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 })
 
-const sortedTransactions = computed(() => {
-  const transactions = transactionStore.transactions
-
-  transactions.forEach(obj => {
-    if (obj.date !== null) {
-      obj.date = new Date(obj.date)
-    }
-    if (obj.dateClassified !== null) {
-      obj.dateClassified = new Date(obj.dateClassified)
-    }
-  })
-
-  transactions.sort((a, b) => {
-    if (a.dateClassified === null && b.dateClassified === null) {
-      if (a.date === null && b.date === null) {
-        return 0
-      }
-      if (a.date === null) {
-        return -1
-      }
-      if (b.date === null) {
-        return 1
-      }
-      return new Date(a.date).getTime() - new Date(b.date).getTime()
-    }
-    if (a.dateClassified === null) {
-      return -1
-    }
-    if (b.dateClassified === null) {
-      return 1
-    }
-    return new Date(a.dateClassified).getTime() - new Date(b.dateClassified).getTime()
-  })
-
-  console.log(transactions)
-  return transactions
+const classifiedTransactions = computed(() => {
+  return transactionStore.transactions
+    .filter(transaction => transaction.dateClassified !== null)
+    .sort((a, b) => (a.dateClassified && b.dateClassified) ? new Date(a.dateClassified).getTime() - new Date(b.dateClassified).getTime() : 0)
 })
 
 const sortedCategories = computed(() => {
