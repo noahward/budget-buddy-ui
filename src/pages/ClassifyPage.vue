@@ -5,19 +5,25 @@
         <div class="col-12 col-sm-5 column">
           <div class="column">
             <AccountDropdown @account-select="selectAccount" />
-            <span class="text-grey-2 text-caption q-mt-xs">
+            <span
+              v-if="selectedAccountId !== null"
+              class="text-grey-2 text-caption q-mt-xs"
+            >
               {{ unclassifiedTransactions.length }} unclassified transaction{{ unclassifiedTransactions.length !== 1 ? 's' : '' }} for this account
             </span>
           </div>
           <q-card
-            v-if="unclassifiedTransactions.length !== 0"
+            v-if="unclassifiedTransactions.length !== 0 && selectedAccountId !== null"
             flat
             class="bg-grey-1 q-mt-md q-pt-sm"
           >
             <span class="text-h6 text-weight-bold q-mx-md">
               Up Next
             </span>
-            <q-card-section class="column q-mb-sm">
+            <q-card-section
+              class="column"
+              :class="{ 'q-mb-sm': unclassifiedTransactions.length !== 0 }"
+            >
               <span class="text-caption text-grey-2">
                 {{ new Date(unclassifiedTransactions[0].date).toLocaleDateString('en-us', dateOptions) }}
               </span>
@@ -30,11 +36,16 @@
               >
                 {{ unclassifiedTransactions[0].amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) }}
               </span>
+              <span
+                v-if="unclassifiedTransactions.length === 0"
+                class="text-caption text-grey-2"
+              >All transactions have been categorized.</span>
             </q-card-section>
           </q-card>
         </div>
 
         <div
+          v-if="selectedAccountId !== null"
           class="col-12 col-sm q-mt-md"
           :class="{ 'q-ml-md': $q.screen.gt.xs }"
         >
@@ -49,7 +60,7 @@
               <span
                 v-if="classifiedTransactions.length === 0"
                 class="text-caption text-grey-2"
-              >Nothing here to show.</span>
+              >Nothing to display here.</span>
               <q-card
                 v-for="transaction in classifiedTransactions"
                 :key="transaction.id"
@@ -66,6 +77,7 @@
       </div>
 
       <q-card
+        v-if="selectedAccountId !== null"
         flat
         class="bg-grey-1 q-mt-md q-pt-sm"
       >
