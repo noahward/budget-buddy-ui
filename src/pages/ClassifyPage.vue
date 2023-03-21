@@ -97,9 +97,26 @@
         flat
         class="bg-grey-1 q-mt-md q-pt-sm"
       >
-        <span class="text-subtitle1 text-weight-medium q-mx-md">
-          Quick Classify
-        </span>
+        <div class="q-my-sm row justify-between">
+          <span class="text-subtitle1 text-weight-medium q-mx-md">
+            Quick Classify
+          </span>
+          <q-btn
+            flat
+            round
+            no-caps
+            dense
+            size="12px"
+            class=" bg-grey-2 text-white q-mx-md"
+            @click="addDialog = true"
+          >
+            <q-icon
+              name="add"
+              size="xs"
+            />
+          </q-btn>
+        </div>
+
         <div class="row">
           <div
             v-for="(categoryArr, index) in sortedCategories"
@@ -129,20 +146,86 @@
           </div>
         </div>
       </q-card>
+
+      <q-dialog
+        v-model="addDialog"
+        persistent
+      >
+        <q-card style="min-width: 350px">
+          <Form
+            :validation-schema="createCategorySchema"
+            @submit="createCategory"
+          >
+            <div class="text-h6 text-weight-bold q-mx-md q-mt-md">
+              Add Category
+            </div>
+            <q-card-section class="column">
+              <div class="column">
+                <div class="text-caption1 text-weight-medium q-mb-xs">
+                  Category Name
+                </div>
+                <InputField
+                  kind="text"
+                  name="name"
+                  :errors="createErrors?.name"
+                />
+              </div>
+              <div class="column">
+                <div class="text-caption1 text-weight-medium q-mb-xs">
+                  Detailed Name
+                </div>
+                <InputField
+                  kind="text"
+                  name="detailedName"
+                  :errors="createErrors?.detailedName"
+                />
+              </div>
+            </q-card-section>
+            <q-card-actions
+              align="right"
+              class="text-primary"
+            >
+              <q-btn
+                v-close-popup
+                no-caps
+                flat
+                class="text-grey-2"
+                label="Cancel"
+              />
+              <q-btn
+                no-caps
+                flat
+                label="Add Account"
+                type="submit"
+              />
+            </q-card-actions>
+          </Form>
+        </q-card>
+      </q-dialog>
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import AccountDropdown from 'components/AccountDropdown.vue'
+import InputField from 'components/InputField.vue'
+import { camelizeKeys } from 'humps'
 import { useCategoryStore } from 'stores/category-store'
 import { useTransactionStore } from 'stores/transaction-store'
-import { ref, computed } from 'vue'
-import { Category } from '../models/category.model'
+import { Form } from 'vee-validate'
+import { computed, ref } from 'vue'
+import { object, string } from 'yup'
+import { getSubmitFn } from '../helpers/validationHelper'
+import { ApiCategoryErrors, Category } from '../models/category.model'
 
 const dateOptions: Intl.DateTimeFormatOptions = {
   year: 'numeric', month: 'short', day: 'numeric'
 }
+
+const createCategorySchema = object({
+  name: string().required('Category name is required'),
+  detailedName: string().required('Detailed name is required')
+})
 
 const categoryStore = useCategoryStore()
 const transactionStore = useTransactionStore()
@@ -150,6 +233,7 @@ const transactionStore = useTransactionStore()
 categoryStore.getCategories()
 
 const selectedAccountId = ref<number | null>(null)
+const addDialog = ref(false)
 
 function selectAccount (id: number) {
   transactionStore.getTransactions(id)
@@ -199,6 +283,18 @@ function submitClassification (categoryId: number) {
     )
   }
 }
+
+const createErrors = ref<ApiCategoryErrors>()
+
+const createCategory = getSubmitFn(createCategorySchema, (values) => {
+  categoryStore.createCategory(values)
+    .then(() => {
+      addDialog.value = false
+    })
+    .catch((error) => {
+      createErrors.value = camelizeKeys(error.response.data)
+    })
+})
 </script>
 
 <style scoped lang="scss">

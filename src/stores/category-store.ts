@@ -1,7 +1,7 @@
 import { api } from 'boot/axios'
-import { camelizeKeys } from 'humps'
+import { camelizeKeys, decamelizeKeys } from 'humps'
 import { defineStore } from 'pinia'
-import { Category } from '../models/category.model'
+import { Category, CreateCategory } from '../models/category.model'
 
 export const useCategoryStore = defineStore('category', {
   state: () => {
@@ -14,6 +14,16 @@ export const useCategoryStore = defineStore('category', {
       return api.get('/categories')
         .then((response) => {
           this.categories = camelizeKeys(response.data) as Category[]
+        })
+        .catch((error) => {
+          throw error
+        })
+    },
+    async createCategory (categoryInfo: CreateCategory) {
+      return api.post('/categories', decamelizeKeys(categoryInfo))
+        .then((response) => {
+          this.categories.push(camelizeKeys(response.data) as Category)
+          console.log(this.categories)
         })
         .catch((error) => {
           throw error

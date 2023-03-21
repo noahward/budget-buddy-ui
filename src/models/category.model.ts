@@ -5,4 +5,14 @@ interface Category {
   user: number | null;
 }
 
-export type { Category }
+interface CreateCategory {
+  name: string;
+  detailedName: string;
+}
+
+interface ApiCategoryErrors {
+  name?: Array<string>;
+  detailedName?: Array<string>;
+}
+
+export type { Category, CreateCategory, ApiCategoryErrors }
