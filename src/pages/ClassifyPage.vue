@@ -62,13 +62,30 @@
                 class="text-caption text-grey-2"
               >Nothing to display here.</span>
               <q-card
-                v-for="transaction in classifiedTransactions"
+                v-for="transaction in classifiedTransactions.slice(0,4)"
                 :key="transaction.id"
                 flat
                 class="q-mb-sm"
               >
-                <div class="q-pa-sm">
-                  {{ transaction }}
+                <div
+                  class="row items-center q-py-sm q-px-md"
+                  style="font-size: 13px;"
+                >
+                  <span class="col-3 text-weight-medium">{{ transaction.amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) }}</span>
+                  <span class="col-5">{{ transaction.description }}</span>
+                  <div class="col-4 row justify-between items-center">
+                    <div class="column">
+                      <span class="text-primary">{{ transaction.categoryName }}</span>
+                      <span class="text-grey-2">{{ transaction.categoryDetailedName }}</span>
+                    </div>
+                    <a>
+                      <q-icon
+                        size="14px"
+                        name="undo"
+                        class="text-grey-2"
+                      />
+                    </a>
+                  </div>
                 </div>
               </q-card>
             </q-card-section>
