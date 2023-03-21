@@ -21,18 +21,17 @@
               Up Next
             </span>
             <q-card-section
-              class="column"
-              :class="{ 'q-mb-sm': unclassifiedTransactions.length !== 0 }"
+              class="column q-my-md"
             >
               <span class="text-caption text-grey-2">
                 {{ new Date(unclassifiedTransactions[0].date).toLocaleDateString('en-us', dateOptions) }}
               </span>
-              <span class="text-subtitle1 text-weight-medium">
+              <span class="text-h6 text-weight-medium">
                 {{ unclassifiedTransactions[0].description }}
               </span>
               <span
                 class="text-weight-bold text-primary q-mt-sm"
-                :class="$q.screen.lt.sm ? 'text-h6' : 'text-h5'"
+                :class="$q.screen.lt.sm ? 'text-h5' : 'text-h4'"
               >
                 {{ unclassifiedTransactions[0].amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) }}
               </span>
@@ -117,6 +116,7 @@
                 dense
                 align="left"
                 class="column q-my-sm full-width"
+                :disable="unclassifiedTransactions.length === 0"
                 :class="category.detailedName === 'Other' ? 'bg-secondary text-white' : 'bg-white'"
                 :style="category.detailedName === 'Other' ? 'font-size: 14px;' : 'font-size: 13px;'"
                 @click="submitClassification(category.id)"
@@ -166,6 +166,7 @@ const classifiedTransactions = computed(() => {
   return transactionStore.transactions
     .filter(transaction => transaction.dateClassified !== null)
     .sort((a, b) => (a.dateClassified && b.dateClassified) ? new Date(a.dateClassified).getTime() - new Date(b.dateClassified).getTime() : 0)
+    .reverse()
 })
 
 const sortedCategories = computed(() => {
