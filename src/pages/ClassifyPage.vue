@@ -10,6 +10,7 @@
             </span>
           </div>
           <q-card
+            v-if="unclassifiedTransactions.length !== 0"
             flat
             class="bg-grey-1 q-mt-md q-pt-sm"
           >
@@ -17,12 +18,18 @@
               Up Next
             </span>
             <q-card-section class="column q-mb-sm">
-              <span class="text-caption text-grey-2">February 6, 2023</span>
-              <span class="text-subtitle1 text-weight-medium">Sony Inter 3.35_V</span>
+              <span class="text-caption text-grey-2">
+                {{ new Date(unclassifiedTransactions[0].date).toLocaleDateString('en-us', dateOptions) }}
+              </span>
+              <span class="text-subtitle1 text-weight-medium">
+                {{ unclassifiedTransactions[0].description }}
+              </span>
               <span
                 class="text-weight-bold text-primary q-mt-sm"
                 :class="$q.screen.lt.sm ? 'text-h6' : 'text-h5'"
-              >-$90.66</span>
+              >
+                {{ unclassifiedTransactions[0].amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) }}
+              </span>
             </q-card-section>
           </q-card>
         </div>
@@ -102,6 +109,10 @@ import { useCategoryStore } from 'stores/category-store'
 import { useTransactionStore } from 'stores/transaction-store'
 import { computed } from 'vue'
 import { Category } from '../models/category.model'
+
+const dateOptions: Intl.DateTimeFormatOptions = {
+  year: 'numeric', month: 'short', day: 'numeric'
+}
 
 const categoryStore = useCategoryStore()
 const transactionStore = useTransactionStore()
