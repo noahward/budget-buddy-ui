@@ -2,14 +2,16 @@
   <div :class="errorMessage ? 'q-mb-sm' : 'q-mb-md'">
     <q-input
       v-model="value"
-      outlined
       dense
       :label="label"
       :type="kind"
+      :disable="props.disable"
+      :outlined="!props.disable"
+      :standout="props.disable"
       v-on="validationListeners"
     />
     <div
-      v-if="errorMessage || errors"
+      v-if="errorMessage || errors.length !== 0"
       class="text-red text-caption row justify-start"
     >
       <q-icon
@@ -33,10 +35,16 @@ import { toRef, computed } from 'vue'
 interface PropTypes {
   name: string;
   kind: 'email' | 'password' | 'text';
-  label?: string;
+  label?: string | undefined;
+  disable?: boolean;
   errors?: Array<string>;
 }
-const props = defineProps<PropTypes>()
+
+const props = withDefaults(defineProps<PropTypes>(), {
+  label: undefined,
+  disable: false,
+  errors: () => []
+})
 
 const { errorMessage, value, handleChange } =
 useField<string>(

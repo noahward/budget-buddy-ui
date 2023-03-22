@@ -159,6 +159,13 @@
             <div class="text-h6 text-weight-bold q-mx-md q-mt-md">
               Add Category
             </div>
+            <div>
+              <q-checkbox
+                v-model="primaryCategory"
+                label="Primary category"
+                class="q-ml-sm q-mt-md"
+              />
+            </div>
             <q-card-section class="column">
               <div class="column">
                 <div class="text-caption1 text-weight-medium q-mb-xs">
@@ -177,6 +184,7 @@
                 <InputField
                   kind="text"
                   name="detailedName"
+                  :disable="primaryCategory"
                   :errors="createErrors?.detailedName"
                 />
               </div>
@@ -186,11 +194,11 @@
               class="text-primary"
             >
               <q-btn
-                v-close-popup
                 no-caps
                 flat
                 class="text-grey-2"
                 label="Cancel"
+                @click="resetForm"
               />
               <q-btn
                 no-caps
@@ -224,11 +232,12 @@ const dateOptions: Intl.DateTimeFormatOptions = {
 
 const createCategorySchema = object({
   name: string().required('Category name is required'),
-  detailedName: string().required('Detailed name is required')
+  detailedName: string()
 })
 
 const categoryStore = useCategoryStore()
 const transactionStore = useTransactionStore()
+const primaryCategory = ref(false)
 
 categoryStore.getCategories()
 
@@ -274,6 +283,12 @@ const sortedCategories = computed(() => {
   return sorted
 })
 
+function resetForm () {
+  createErrors.value = {}
+  primaryCategory.value = false
+  addDialog.value = false
+}
+
 function submitClassification (categoryId: number) {
   if (selectedAccountId.value !== null) {
     return transactionStore.classifyTransaction(
@@ -284,12 +299,21 @@ function submitClassification (categoryId: number) {
   }
 }
 
-const createErrors = ref<ApiCategoryErrors>()
+const createErrors = ref<ApiCategoryErrors>({})
 
 const createCategory = getSubmitFn(createCategorySchema, (values) => {
+  if (values.detailedName === undefined && !primaryCategory.value) {
+    createErrors.value.detailedName = ['Detailed name is required']
+    return
+  }
+  if (primaryCategory.value) {
+    values.detailedName = 'Other'
+  }
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   categoryStore.createCategory(values)
     .then(() => {
-      addDialog.value = false
+      resetForm()
     })
     .catch((error) => {
       createErrors.value = camelizeKeys(error.response.data)
