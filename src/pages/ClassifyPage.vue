@@ -315,7 +315,7 @@ const createCategory = getSubmitFn(createCategorySchema, (values) => {
   }
 
   let newValues: CreateCategory[] | CreateCategory = values
-  if (!primaryCatExists(sortedCategories.value, values.name)) {
+  if (!primaryCatExists(sortedCategories.value, values.name) && !primaryCategory.value) {
     const mainCategory = { name: values.name, detailedName: 'Other' }
     newValues = [values, mainCategory]
   }
