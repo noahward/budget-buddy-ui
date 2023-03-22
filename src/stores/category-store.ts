@@ -19,11 +19,10 @@ export const useCategoryStore = defineStore('category', {
           throw error
         })
     },
-    async createCategory (categoryInfo: CreateCategory) {
+    async createCategory (categoryInfo: CreateCategory | CreateCategory[]) {
       return api.post('/categories', decamelizeKeys(categoryInfo))
         .then((response) => {
           this.categories.push(camelizeKeys(response.data) as Category)
-          console.log(this.categories)
         })
         .catch((error) => {
           throw error

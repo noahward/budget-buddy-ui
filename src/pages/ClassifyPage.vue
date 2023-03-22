@@ -224,7 +224,7 @@ import { Form } from 'vee-validate'
 import { computed, ref } from 'vue'
 import { object, string } from 'yup'
 import { getSubmitFn } from '../helpers/validationHelper'
-import { ApiCategoryErrors, Category } from '../models/category.model'
+import { ApiCategoryErrors, Category, CreateCategory } from '../models/category.model'
 
 const dateOptions: Intl.DateTimeFormatOptions = {
   year: 'numeric', month: 'short', day: 'numeric'
@@ -301,6 +301,10 @@ function submitClassification (categoryId: number) {
 
 const createErrors = ref<ApiCategoryErrors>({})
 
+function primaryCatExists (catArr: Array<Array<Category>>, name: string) {
+  return catArr.some(innerArr => innerArr.find(obj => obj.name === name && obj.detailedName === 'Other'))
+}
+
 const createCategory = getSubmitFn(createCategorySchema, (values) => {
   if (values.detailedName === undefined && !primaryCategory.value) {
     createErrors.value.detailedName = ['Detailed name is required']
@@ -309,9 +313,15 @@ const createCategory = getSubmitFn(createCategorySchema, (values) => {
   if (primaryCategory.value) {
     values.detailedName = 'Other'
   }
+
+  let newValues: CreateCategory[] | CreateCategory = values
+  if (!primaryCatExists(sortedCategories.value, values.name)) {
+    const mainCategory = { name: values.name, detailedName: 'Other' }
+    newValues = [values, mainCategory]
+  }
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  categoryStore.createCategory(values)
+  categoryStore.createCategory(newValues)
     .then(() => {
       resetForm()
     })

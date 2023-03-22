@@ -7,7 +7,7 @@ interface Category {
 
 interface CreateCategory {
   name: string;
-  detailedName: string;
+  detailedName?: string;
 }
 
 interface ApiCategoryErrors {
